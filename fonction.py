@@ -521,10 +521,24 @@ def fonction0x1B(adresse_appareil) :
 # LES FONCTIONS SUIVANTES SONT POUR LA PLUPART UNIQUEMENT UTILISE PAR LES DX?
 
 def fonction0x40(adresse_appareil, nombre) :
+    '''
+    Cette fonction à besoin d'un port ouvert donné par la variable port_serial, de l'adresse de l'appareil ainsi qu'une valeur qui sera afficher sur le panneau (compris entre 0 et 10.000)
+    Elle sert à modifie la valeur du potentiomètre digital
+    La trame envoye 5 octets
+    La trame reçu est de 1 octets
+    '''
+    if nombre < 0 or nombre > 10_000 :
+        raise NameError("Veuillez saisir un nombre compris entre 0 et 10.000")
+    
+    # Formatage 4 deviendra 0004
+    nombre = "{0:04d}".format(nombre)
     fonction = "40"
-    nombre = 
-    bcc = hex(int(adresse_appareil, 16) + int(fonction, 16) + int("04") + )[2:] 
-    trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
+    hexa_nombre_un = hex(ord(nombre[0]))
+    hexa_nombre_deux = hex(ord(nombre[1]))
+    hexa_nombre_trois = hex(ord(nombre[2]))
+    hexa_nombre_quatre = hex(ord(nombre[3]))
+    bcc = hex(int(adresse_appareil, 16) + int(fonction, 16) + int("04", 16) + int(hexa_nombre_un) + int(hexa_nombre_deux) + int(hexa_nombre_trois) + int(hexa_nombre_quatre) )[2:]
+    trame = bytes.fromhex(str(adresse_appareil + fonction + "04" + hexa_nombre_un + hexa_nombre_deux + hexa_nombre_trois + hexa_nombre_quatre + bcc))
     port_serial.write(trame)
     reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
 
