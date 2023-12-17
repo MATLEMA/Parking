@@ -83,7 +83,7 @@ def detection_appareil() :
     # Variables
     dictionnaire_appareils : dict[str, str] = {}
     nombre_appareil = 1
-    modele_appareil =None
+    modele_appareil = None
 
     for i in range(0,256) :
 
@@ -156,7 +156,7 @@ def detection_appareil() :
         raise NameError("L'appareil n'a pas répondu :( vérifier votre installation ou l'adresse donnée !") """
 
 # Active ou désactive le mode test du capteur    
-def fonction0x01(adresse_appareil) :  
+def fonction0x01(port_serial, adresse_appareil) :  
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial ainsi que l'adresse_appareil
     Elle sert à activer ou désactiver le mode test du capteur
@@ -173,7 +173,7 @@ def fonction0x01(adresse_appareil) :
         raise NameError("L'appareil n'a pas répondu :( vérifier votre installation ou l'adresse donnée !")
 
 # Active / désactive la calibration du potentiomètre 
-def fonction0x02(adresse_appareil) :
+def fonction0x02(port_serial, adresse_appareil) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial ainsi que l'adresse_appareil
     Elle sert à activer ou désactiver la calibration du potentiomètre
@@ -190,7 +190,7 @@ def fonction0x02(adresse_appareil) :
         raise NameError("L'appareil n'a pas répondu :( vérifier votre installation ou l'adresse donnée !")
 
 # Retourne si l'appareil est en mode reception ou reception/transmission
-def fonction0x03(adresse_appareil) :
+def fonction0x03(port_serial, adresse_appareil) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial ainsi que l'adresse_appareil
     Elle sert à retourner si l'appareil est en mode réception ou réception/transmission
@@ -216,7 +216,7 @@ def fonction0x03(adresse_appareil) :
     return is_transmission
 
 # Retourne la valeur du potentiomètre digital (1 à 64)        
-def fonction0x04(adresse_appareil) :
+def fonction0x04(port_serial, adresse_appareil) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial ainsi que l'adresse_appareil
     Elle sert à retourner la valeur du potentiomètre digital
@@ -236,7 +236,7 @@ def fonction0x04(adresse_appareil) :
     return valeur
 
 # Recherche les informations d'un équipement (Nom de l'équipement | version)
-def fonction0x05(adresse_appareil) :
+def fonction0x05(port_serial, adresse_appareil) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial ainsi que l'adresse_appareil
     Elle sert à retourner le nom de l'équipement ainsi 
@@ -285,7 +285,7 @@ def fonction0x05(adresse_appareil) :
         sys.exit("Il y a eu une erreur !")
 
 # Retourne la distance de détection maximal du capteur
-def fonction0x06(adresse_appareil) :
+def fonction0x06(port_serial, adresse_appareil) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial ainsi que l'adresse_appareil
     Elle sert à Retourner la distance de détection maximal du capteur
@@ -314,7 +314,7 @@ def fonction0x06(adresse_appareil) :
         return 400
 
 # Retourne le mode de détection du capteur
-def fonction0x07(adresse_appareil) :
+def fonction0x07(port_serial, adresse_appareil) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial ainsi que l'adresse_appareil
     Elle sert à retourner le mode de détection du capteur
@@ -335,7 +335,7 @@ def fonction0x07(adresse_appareil) :
         return False
 
 # Retourne le mode d'étalonnage du capteur 
-def fonction0x09(adresse_appareil) :
+def fonction0x09(port_serial, adresse_appareil) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial ainsi que l'adresse_appareil
     Elle sert à retourner le mode d'étalonnage du capteur
@@ -366,7 +366,7 @@ def fonction0x09(adresse_appareil) :
         print("L'appareil n'est pas en mode d'étalonnage au sol")    
 
 # Renvoie si la place est libre ou non 
-def fonction0x10(adresse_appareil) :
+def fonction0x10(port_serial, adresse_appareil) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial ainsi que l'adresse_appareil
     Elle sert à retourner si la place est libre ou non 
@@ -386,7 +386,7 @@ def fonction0x10(adresse_appareil) :
     return is_open
 
 # Modifie la distance maximal de detection
-def fonction0x11(adresse_appareil, distance) :
+def fonction0x11(port_serial, adresse_appareil, distance) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial, l'adresse_appareil ainsi qu'une distance (en cm) entre 150 et l'infinie?
     Elle sert à modifier la distance maximal de détection
@@ -413,7 +413,7 @@ def fonction0x11(adresse_appareil, distance) :
         return False
 
 # Modifie le mode de détection 
-def fonction0x12(adresse_appareil, mode : bool) :
+def fonction0x12(port_serial, adresse_appareil, mode : bool) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial, de l'adresse de l'appareil ainsi que le mode voulu (bool)
     Elle sert à modifier le mode de détection du capteur
@@ -439,7 +439,7 @@ def fonction0x12(adresse_appareil, mode : bool) :
         return False
 
 # Modifie le capteur en mode reception ou reception/transmission
-def fonction0x13(adresse_appareil, mode : bool) :
+def fonction0x13(port_serial, adresse_appareil, mode : bool) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial, de l'adresse de l'appareil ainsi que le mode voulu (bool)
     Elle sert à modifie le capteur en mode reception ou reception/transmission
@@ -459,7 +459,7 @@ def fonction0x13(adresse_appareil, mode : bool) :
     reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
 
 # Modifie la valeur du potenctiomètre digital
-def fonction0x14(adresse_appareil, valeur) :
+def fonction0x14(port_serial, adresse_appareil, valeur) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial, de l'adresse de l'appareil ainsi qu'une valeur comprise entre 1 et 64
     Elle sert à modifie la valeur du potentiomètre digital
@@ -476,7 +476,7 @@ def fonction0x14(adresse_appareil, valeur) :
     reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
 
 # Force le capteur à clignoter lorsque le siège est libre
-def fonction0x15(adresse_appareil, temps) :
+def fonction0x15(port_serial, adresse_appareil, temps) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial, de l'adresse de l'appareil ainsi qu'une valeur de temps(en ms) mutliple de 100ms et ne doit pas dépasser 
     Elle sert à modifie la valeur du potentiomètre digital
@@ -493,7 +493,7 @@ def fonction0x15(adresse_appareil, temps) :
     reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
 
 # Force les leds à devenir de couleur verte
-def fonction0x19(adresse_appareil) :
+def fonction0x19(port_serial, adresse_appareil) :
     fonction = "19"
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16))[2:] 
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
@@ -501,7 +501,7 @@ def fonction0x19(adresse_appareil) :
     reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
 
 # Force les leds à devenir de couleur rouge
-def fonction0x1A(adresse_appareil) :
+def fonction0x1A(port_serial, adresse_appareil) :
     fonction = "1A"
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16))[2:] 
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
@@ -509,7 +509,7 @@ def fonction0x1A(adresse_appareil) :
     reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
 
 # Force les leds à devenir de couleur orange
-def fonction0x1B(adresse_appareil) :
+def fonction0x1B(port_serial, adresse_appareil) :
     fonction = "1B"
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16))[2:] 
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
@@ -520,7 +520,8 @@ def fonction0x1B(adresse_appareil) :
 
 # LES FONCTIONS SUIVANTES SONT POUR LA PLUPART UNIQUEMENT UTILISE PAR LES DX?
 
-def fonction0x40(adresse_appareil, nombre) :
+# 
+def fonction0x40(port_serial, adresse_appareil, nombre) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial, de l'adresse de l'appareil ainsi qu'une valeur qui sera afficher sur le panneau (compris entre 0 et 10.000)
     Elle sert à modifie la valeur du potentiomètre digital
@@ -542,18 +543,36 @@ def fonction0x40(adresse_appareil, nombre) :
     port_serial.write(trame)
     reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
 
-def fonction0x4B(adresse_appareil) :                                                            # Modifier le sens d'affichage
+def fonction0x4B(port_serial, adresse_appareil) :                                                            # Modifier le sens d'affichage
         fonction = "4B"
         bcc = hex(int(adresse_appareil, 16) + int(fonction, 16) + int(1))[2:]                      # Fabrication du byte verifiant la somme de tous les octets précédent, verifiant ainsi l'intégrité de la trame 
         trame = bytes.fromhex(str(adresse_appareil + fonction + "01" + bcc))
         port_serial.write(trame)
         reponse_port = port_serial.read(2).hex()
 
-def fonction0x49(adresse_appareil) :                                                            # Modifier le sens d'affichage
+def fonction0x49(port_serial, adresse_appareil) :                                                            # Modifier le sens d'affichage
         fonction = "49"
         bcc = hex(int(adresse_appareil, 16) + int(fonction, 16) + int(1))[2:]                      # Fabrication du byte verifiant la somme de tous les octets précédent, verifiant ainsi l'intégrité de la trame 
         trame = bytes.fromhex(str(adresse_appareil + fonction + "01" + bcc))
         port_serial.write(trame)
         reponse_port = port_serial.read(2).hex()
 
+# Script combo capteur / display 
+if __name__ == "__main__" :
+    
+    # Variables
+    nom_appareil_SP3 : str 
+    nom_appareil_DX3 : str
+    compteur_voiture : int = 0
 
+    # Obtenir les adresses des appareils 
+    nom_appareil_SP3 = input("Veuillez saisir l'adresse du SP3 : ")
+    nom_appareil_DX3 = input("Veuillez saisir l'adresse du DX3 : ")
+
+    # Si une place est disponible mettre 1 sur l'afficheur sinon non
+    if fonction0x10(port_serial, nom_appareil_SP3) == True :
+        compteur_voiture = 1
+        fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture)
+    else : 
+        compteur_voiture = 0
+        fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture)
