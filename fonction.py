@@ -543,6 +543,23 @@ def fonction0x40(port_serial, adresse_appareil, nombre) :
     port_serial.write(trame)
     reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
 
+# Modifie la luminosité des leds 
+def fonction0x41(port_serial, adresse_appareil, valeur) :
+    '''
+    Cette fonction à besoin d'un port ouvert donné par la variable port_serial, de l'adresse de l'appareil ainsi qu'une valeur entre 10 et 250 inclus
+    Elle sert à modifier la luminosité des leds des SP3 et DX3
+    La trame envoye 5 octets
+    La trame reçu est de 1 octets
+    '''
+    if valeur < 10 or valeur > 250 :
+        raise NameError("Veuillez saisir une valeur entre 10 et 250 !")
+    luminosité = hex(int(valeur)) 
+    fonction = "41"
+    bcc = hex(int(adresse_appareil, 16) + int(fonction, 16) + int("01",16) + int(luminosité, 16))[2:] 
+    trame = bytes.fromhex(str(adresse_appareil + fonction + "01" + luminosité + bcc))
+    port_serial.write(trame)
+    reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
+    
 # Modifie le type de caractère à partir de zero?
 def fonction0x4B(port_serial, adresse_appareil) :                                                            # Modifier le sens d'affichage
         fonction = "4B"
