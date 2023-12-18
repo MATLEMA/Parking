@@ -1,7 +1,6 @@
 import serial
 import serial.tools.list_ports
 import sys
-import math
 import ma_class
 
 # Variables : 
@@ -18,6 +17,15 @@ if __name__ == "__main__" :
     for information_port_disponible in (listing_des_ports) :
         print(f"{information_port_disponible.device} | {information_port_disponible.description} | {information_port_disponible.interface}\n")
 
+def listing_port() :
+    dictionnaire_port : list[str] = []
+    listing_des_ports = serial.tools.list_ports.comports()                                                                                                   # Création d'une liste sous forme de class ListPortInfo
+
+    # Boucle qui passe par tout les paramètres de la class ListPortInfo de notre variable listing_des_ports
+    for information_port_disponible in listing_des_ports :
+        dictionnaire_port.append(information_port_disponible.device)
+    return dictionnaire_port
+
 # Ceci est un test pour voir si le port donné par l'utilisateur est ouvert
 if __name__ == "__main__" :
     '''
@@ -33,7 +41,7 @@ if __name__ == "__main__" :
         # Boucle pour l'adressage du port 
         while True :
             try : 
-                port = str(input("Veuillez l'adresse du port : "))
+                port = str(input("Veuillez saisir l'adresse du port : "))
                 break
             except ValueError : 
                 print("*Erreur type : Valeur ")
@@ -62,8 +70,6 @@ if __name__ == "__main__" :
             break
         except serial.SerialException :
             print(f"Le port {port} n'est pas ouvert réessayer avec un autre port ou verifier votre installation !")
-else : 
-    sys.exit()
 
 # LES FONCTIONS SUIVANTES SONT POUR LA PLUPART UNIQUEMENT UTILISE PAR LE SP3
 # Détection automatique de tous les appareils connectés en réseau serie
@@ -623,6 +629,8 @@ if __name__ == "__main__" :
     nom_appareil_DX3 : str
     compteur_voiture : int = 0
 
+    x = listing_port()
+    print(x)
     # Obtenir les adresses des appareils 
     nom_appareil_SP3 = input("Veuillez saisir l'adresse du SP3 : ")
     nom_appareil_DX3 = input("Veuillez saisir l'adresse du DX3 : ")
