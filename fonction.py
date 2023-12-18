@@ -82,7 +82,9 @@ def detection_appareil() :
     
     # Variables
     dictionnaire_appareils : dict[str, str] = {}
-    nombre_appareil = 1
+    
+    # Pour la nomenclature des appareils 
+    nombre_appareil = 1                                             
     modele_appareil = None
 
     for i in range(0,256) :
@@ -98,6 +100,7 @@ def detection_appareil() :
             continue
         else : 
             modele_appareil_hexa = reponse_appareil[2:4]   
+            # 
             for cle, valeur in dictionnaire_nom_hexa.items() :
                 if modele_appareil_hexa == valeur:
                     modele_appareil= cle
@@ -247,6 +250,7 @@ def fonction0x05(port_serial, adresse_appareil) :
     '''
     fonction = "05"
     nom_appareil = None
+
     dictionnaire_nom_hexa: dict[str,str] = {"SP1": "02", "D3": "02", "MR4/dp": "0x23", "D4": "0x2E", "DX2-VMS": "0x3B", "DX4-VMS": "0x3D", "DXCA": "0x44", "SP2": "0x1D", "DX3": "0x1E", "DX2": "0x2D", "SP3": "0x2B", "DX3-VMS": "0x3C", "DX-VMS-F": "0x3E", "GS24x8RGB": "0x3F"}
     if len(adresse_appareil) == 4 :
         bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16))[2:]
@@ -263,7 +267,7 @@ def fonction0x05(port_serial, adresse_appareil) :
         # Détection de la version de l'objet
         version_appareil = reponse_appareil[6:8]
         version_appareil = int(version_appareil, 16)/10                                            # 0x1A = 10 (decimal) = version 1.0
-        return nom_appareil, version_appareil
+        return nom_appareil, version_appareil, True
             
     elif len(adresse_appareil) == 2 :
         bcc = hex(int(adresse_appareil, 16) + int(fonction, 16))[2:]
@@ -279,7 +283,7 @@ def fonction0x05(port_serial, adresse_appareil) :
         # Détection de la version de l'objet
         version_appareil = reponse_appareil[6:8]
         version_appareil = int(version_appareil, 16)/10
-        return nom_appareil, version_appareil 
+        return nom_appareil, version_appareil, True
 
     else : 
         sys.exit("Il y a eu une erreur !")
@@ -379,6 +383,9 @@ def fonction0x10(port_serial, adresse_appareil) :
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
     port_serial.write(trame)
     reponse_port = port_serial.read(4).hex()
+    print('i',reponse_port)
+    if reponse_port == "" :
+        raise NameError(f"Le capteur {adresse_appareil} n'est pas connecter ! ou n'a pas répondu !")
     if reponse_port[4:6] == "00":
         is_open = True
     else : 
@@ -529,16 +536,17 @@ def fonction0x40(port_serial, adresse_appareil, nombre) :
     La trame reçu est de 1 octets
     '''
     if nombre < 0 or nombre > 10_000 :
-        raise NameError("Veuillez saisir un nombre compris entre 0 et 10.000")
+        raise ValueError("Veuillez saisir un nombre compris entre 0 et 10.000")
     
     # Formatage 4 deviendra 0004
-    nombre = "{0:04d}".format(nombre)
+    nombre = "{0:04d}".format(int(nombre))
     fonction = "40"
-    hexa_nombre_un = hex(ord(nombre[0]))
-    hexa_nombre_deux = hex(ord(nombre[1]))
-    hexa_nombre_trois = hex(ord(nombre[2]))
-    hexa_nombre_quatre = hex(ord(nombre[3]))
-    bcc = hex(int(adresse_appareil, 16) + int(fonction, 16) + int("04", 16) + int(hexa_nombre_un) + int(hexa_nombre_deux) + int(hexa_nombre_trois) + int(hexa_nombre_quatre) )[2:]
+    hexa_nombre_un = hex(ord(nombre[0]))[2:]
+    hexa_nombre_deux = hex(ord(nombre[1]))[2:]
+    hexa_nombre_trois = hex(ord(nombre[2]))[2:]
+    hexa_nombre_quatre = hex(ord(nombre[3]))[2:]
+    bcc = hex(int(adresse_appareil, 16) + int(fonction, 16) + int("04", 16) + int(hexa_nombre_un, 16) + int(hexa_nombre_deux, 16) + int(hexa_nombre_trois, 16) + int(hexa_nombre_quatre, 16) )[2:]
+    print(str(adresse_appareil + fonction + "04" + hexa_nombre_un + hexa_nombre_deux + hexa_nombre_trois + hexa_nombre_quatre + bcc))
     trame = bytes.fromhex(str(adresse_appareil + fonction + "04" + hexa_nombre_un + hexa_nombre_deux + hexa_nombre_trois + hexa_nombre_quatre + bcc))
     port_serial.write(trame)
     reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
@@ -548,11 +556,11 @@ def fonction0x41(port_serial, adresse_appareil, valeur) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial, de l'adresse de l'appareil ainsi qu'une valeur entre 10 et 250 inclus
     Elle sert à modifier la luminosité des leds des SP3 et DX3
-    La trame envoye 5 octets
-    La trame reçu est de 1 octets
+    La trame envoye 3 octets
+    La trame reçu est de 3 octets
     '''
     if valeur < 10 or valeur > 250 :
-        raise NameError("Veuillez saisir une valeur entre 10 et 250 !")
+        raise ValueError("Veuillez saisir une valeur entre 10 et 250 !")
     luminosité = hex(int(valeur)) 
     fonction = "41"
     bcc = hex(int(adresse_appareil, 16) + int(fonction, 16) + int("01",16) + int(luminosité, 16))[2:] 
@@ -560,8 +568,28 @@ def fonction0x41(port_serial, adresse_appareil, valeur) :
     port_serial.write(trame)
     reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
     
+# Affiche la valeur actuelle de la luminosité des leds
+def fonction0x42(port_serial, adresse_appareil) :
+    '''
+    Cette fonction à besoin d'un port ouvert donné par la variable port_serial, de l'adresse de l'appareil
+    Elle sert à afficher la valeur actuelle de la luminosité des leds
+    La trame envoye 3 octets
+    La trame reçu est de 3 octets
+    NE SUPPORTE PAS LES SP3 ACTUELLEMENT
+    '''
+    fonction = "42"
+    bcc = hex(int(adresse_appareil, 16) + int(fonction, 16))[2:] 
+    trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
+    port_serial.write(trame)
+    reponse_port = port_serial.read(4).hex()
+    if reponse_port == "" : 
+        raise NameError("L'appareil n'a pas répondu :( vérifier votre installation ou l'adresse donnée !")
+    valeur = int(reponse_port[2:4], 16)
+    return valeur
+
+
 # Modifie le type de caractère à partir de zero?
-def fonction0x4B(port_serial, adresse_appareil) :                                                            # Modifier le sens d'affichage
+def fonction0x4B(port_serial, adresse_appareil) :
         fonction = "4B"
         bcc = hex(int(adresse_appareil, 16) + int(fonction, 16) + int(1))[2:]                      # Fabrication du byte verifiant la somme de tous les octets précédent, verifiant ainsi l'intégrité de la trame 
         trame = bytes.fromhex(str(adresse_appareil + fonction + "01" + bcc))
@@ -569,7 +597,7 @@ def fonction0x4B(port_serial, adresse_appareil) :                               
         reponse_port = port_serial.read(2).hex()
 
 # Modifie le sens haut/bas de l'afficheur
-def fonction0x49(port_serial, adresse_appareil, direction : bool) :                                                            # Modifier le sens d'affichage
+def fonction0x49(port_serial, adresse_appareil, direction : bool) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial, de l'adresse de l'appareil ainsi qu'une booléenne True : vers le haut , False : vers le bas 
     Elle sert à modifier le sens haut/bas de l'afficheur
@@ -582,7 +610,7 @@ def fonction0x49(port_serial, adresse_appareil, direction : bool) :             
     else : 
         direction_hexa = "00"
 
-    bcc = hex(int(adresse_appareil, 16) + int(fonction, 16) + int(direction_hexa))[2:]                      # Fabrication du byte verifiant la somme de tous les octets précédent, verifiant ainsi l'intégrité de la trame 
+    bcc = hex(int(adresse_appareil, 16) + int(fonction, 16) + int(direction_hexa))[2:]
     trame = bytes.fromhex(str(adresse_appareil + fonction + direction_hexa + bcc))
     port_serial.write(trame)
     reponse_port = port_serial.read(2).hex()    # Voir si ça ne casse pas le script
@@ -591,7 +619,7 @@ def fonction0x49(port_serial, adresse_appareil, direction : bool) :             
 if __name__ == "__main__" :
     
     # Variables
-    nom_appareil_SP3 : str 
+    nom_appareil_SP3 : str
     nom_appareil_DX3 : str
     compteur_voiture : int = 0
 
@@ -600,9 +628,10 @@ if __name__ == "__main__" :
     nom_appareil_DX3 = input("Veuillez saisir l'adresse du DX3 : ")
 
     # Si une place est disponible mettre 1 sur l'afficheur sinon non
-    if fonction0x10(port_serial, nom_appareil_SP3) == True :
-        compteur_voiture = 1
-        fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture)
-    else : 
-        compteur_voiture = 0
-        fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture)
+    while True: 
+        if fonction0x10(port_serial, nom_appareil_SP3) == True :
+            compteur_voiture = 1
+            fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture)
+        else : 
+            compteur_voiture = 0
+            fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture)
