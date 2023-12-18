@@ -520,7 +520,7 @@ def fonction0x1B(port_serial, adresse_appareil) :
 
 # LES FONCTIONS SUIVANTES SONT POUR LA PLUPART UNIQUEMENT UTILISE PAR LES DX?
 
-# 
+# Modifie les chiffres affichés sur l'afficheur
 def fonction0x40(port_serial, adresse_appareil, nombre) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial, de l'adresse de l'appareil ainsi qu'une valeur qui sera afficher sur le panneau (compris entre 0 et 10.000)
@@ -543,6 +543,7 @@ def fonction0x40(port_serial, adresse_appareil, nombre) :
     port_serial.write(trame)
     reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
 
+# Modifie le type de caractère à partir de zero?
 def fonction0x4B(port_serial, adresse_appareil) :                                                            # Modifier le sens d'affichage
         fonction = "4B"
         bcc = hex(int(adresse_appareil, 16) + int(fonction, 16) + int(1))[2:]                      # Fabrication du byte verifiant la somme de tous les octets précédent, verifiant ainsi l'intégrité de la trame 
@@ -550,12 +551,24 @@ def fonction0x4B(port_serial, adresse_appareil) :                               
         port_serial.write(trame)
         reponse_port = port_serial.read(2).hex()
 
-def fonction0x49(port_serial, adresse_appareil) :                                                            # Modifier le sens d'affichage
-        fonction = "49"
-        bcc = hex(int(adresse_appareil, 16) + int(fonction, 16) + int(1))[2:]                      # Fabrication du byte verifiant la somme de tous les octets précédent, verifiant ainsi l'intégrité de la trame 
-        trame = bytes.fromhex(str(adresse_appareil + fonction + "01" + bcc))
-        port_serial.write(trame)
-        reponse_port = port_serial.read(2).hex()
+# Modifie le sens haut/bas de l'afficheur
+def fonction0x49(port_serial, adresse_appareil, direction : bool) :                                                            # Modifier le sens d'affichage
+    '''
+    Cette fonction à besoin d'un port ouvert donné par la variable port_serial, de l'adresse de l'appareil ainsi qu'une booléenne True : vers le haut , False : vers le bas 
+    Elle sert à modifier le sens haut/bas de l'afficheur
+    La trame envoye 4 octets
+    La trame reçu est de 1 octet
+    '''
+    fonction = "49"
+    if direction == True : 
+        direction_hexa = "01"
+    else : 
+        direction_hexa = "00"
+
+    bcc = hex(int(adresse_appareil, 16) + int(fonction, 16) + int(direction_hexa))[2:]                      # Fabrication du byte verifiant la somme de tous les octets précédent, verifiant ainsi l'intégrité de la trame 
+    trame = bytes.fromhex(str(adresse_appareil + fonction + direction_hexa + bcc))
+    port_serial.write(trame)
+    reponse_port = port_serial.read(2).hex()    # Voir si ça ne casse pas le script
 
 # Script combo capteur / display 
 if __name__ == "__main__" :
