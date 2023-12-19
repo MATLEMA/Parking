@@ -2,12 +2,33 @@ import serial
 import serial.tools.list_ports
 import sys
 import ma_class
+from tkinter import messagebox
 
 # Variables : 
 port : str                              # Dossier du port COM sélectionné
 baudrate : int                          # Baudrate
 timeout : float                         # Timeout port
 
+############################################################################################################################################################################
+
+# Fonction uniquement pour body.py
+
+# Teste si le port est ouvert 
+def connecter(port, baudrate, timeout):
+    baudrate = int(baudrate)
+    timeout = float(timeout)
+
+    try :
+        port_serial = serial.Serial(port, baudrate, timeout= timeout)
+        messagebox.showinfo(title= "Succès",
+                            message= "Succès"
+        )
+        return True
+    except serial.SerialException :
+        return False
+
+############################################################################################################################################################################
+    
 # Listing des ports // Doit marcher sur linux et windows !! 
 if __name__ == "__main__" :
     listing_des_ports = serial.tools.list_ports.comports()                                                                                                   # Création d'une liste sous forme de class ListPortInfo
@@ -17,6 +38,7 @@ if __name__ == "__main__" :
     for information_port_disponible in (listing_des_ports) :
         print(f"{information_port_disponible.device} | {information_port_disponible.description} | {information_port_disponible.interface}\n")
 
+# Liste les port sur la machine
 def listing_port() :
     dictionnaire_port : list[str] = []
     listing_des_ports = serial.tools.list_ports.comports()                                                                                                   # Création d'une liste sous forme de class ListPortInfo
@@ -27,10 +49,9 @@ def listing_port() :
     return dictionnaire_port
 
 # Ceci est un test pour voir si le port donné par l'utilisateur est ouvert
-if __name__ == "__main__" :
+def test_port_ouvert() :
     '''
     Ceci est un test pour voir si le port donné par l'utilisateur est ouvert
-
     L'utilisateur va grâce au listing des ports sélectionner son port 
     Puis son baud rate /! Certains appareils ne peuvent pas supporter des valeurs de 9600 ou 19200 !
     Puis le timeout
@@ -66,12 +87,11 @@ if __name__ == "__main__" :
         # Si oui les variables seront stockées
         try :
             port_serial = serial.Serial(port, baudrate=baudrate, timeout=timeout)
-            print(f"Le port {port} est ouvert ! ")
             break
         except serial.SerialException :
             print(f"Le port {port} n'est pas ouvert réessayer avec un autre port ou verifier votre installation !")
+    return port, baudrate, timeout, port_serial
 
-# LES FONCTIONS SUIVANTES SONT POUR LA PLUPART UNIQUEMENT UTILISE PAR LE SP3
 # Détection automatique de tous les appareils connectés en réseau serie
 def detection_appareil() :
     '''
@@ -144,6 +164,10 @@ def detection_appareil() :
                 dictionnaire_appareils[nouvel_appareil.modele] = str(test_ping_4)
 
     return dictionnaire_appareils
+
+############################################################################################################################################################################
+
+# LES FONCTIONS SUIVANTES SONT POUR LA PLUPART UNIQUEMENT UTILISE PAR LE SP3
 
 # Programme l'adresse_appareil de l'appareil
 """ def fonction0x00(adresse_appareil) :
@@ -389,7 +413,6 @@ def fonction0x10(port_serial, adresse_appareil) :
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
     port_serial.write(trame)
     reponse_port = port_serial.read(4).hex()
-    print('i',reponse_port)
     if reponse_port == "" :
         raise NameError(f"Le capteur {adresse_appareil} n'est pas connecter ! ou n'a pas répondu !")
     if reponse_port[4:6] == "00":
@@ -529,7 +552,7 @@ def fonction0x1B(port_serial, adresse_appareil) :
     port_serial.write(trame)
     reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
     
-######################################################################################################################
+############################################################################################################################################################################
 
 # LES FONCTIONS SUIVANTES SONT POUR LA PLUPART UNIQUEMENT UTILISE PAR LES DX?
 
@@ -593,6 +616,22 @@ def fonction0x42(port_serial, adresse_appareil) :
     valeur = int(reponse_port[2:4], 16)
     return valeur
 
+# Affiche la direction de l'afficheur sur l'afficheur
+def fonction0x43(port_serial, adresse_appareil) :
+    '''
+    Cette fonction à besoin d'un port ouvert donné par la variable port_seriale et de l'adresse de l'appareil
+    Elle sert à afficher la valeur actuelle de la luminosité des leds
+    La trame envoye 3 octets
+    La trame reçu est de 1 octets
+    '''
+    fonction = "43"
+    bcc = hex(int(adresse_appareil, 16) + int(fonction, 16))[2:] 
+    trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
+    port_serial.write(trame)
+    reponse_port = port_serial.read(1).hex()
+    if reponse_port == "" : 
+        raise NameError("L'appareil n'a pas répondu :( vérifier votre installation ou l'adresse donnée !")
+
 
 # Modifie le type de caractère à partir de zero?
 def fonction0x4B(port_serial, adresse_appareil) :
@@ -624,22 +663,22 @@ def fonction0x49(port_serial, adresse_appareil, direction : bool) :
 # Script combo capteur / display 
 if __name__ == "__main__" :
     
-    # Variables
-    nom_appareil_SP3 : str
-    nom_appareil_DX3 : str
-    compteur_voiture : int = 0
+    port, baudrate, timeout, port_serial = test_port_ouvert()
+    with port_serial :
+        # Variables
+        nom_appareil_SP3 : str
+        nom_appareil_DX3 : str
+        compteur_voiture : int = 0
 
-    x = listing_port()
-    print(x)
-    # Obtenir les adresses des appareils 
-    nom_appareil_SP3 = input("Veuillez saisir l'adresse du SP3 : ")
-    nom_appareil_DX3 = input("Veuillez saisir l'adresse du DX3 : ")
+        # Obtenir les adresses des appareils 
+        nom_appareil_SP3 = input("Veuillez saisir l'adresse du SP3 : ")
+        nom_appareil_DX3 = input("Veuillez saisir l'adresse du DX3 : ")
 
-    # Si une place est disponible mettre 1 sur l'afficheur sinon non
-    while True: 
-        if fonction0x10(port_serial, nom_appareil_SP3) == True :
-            compteur_voiture = 1
-            fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture)
-        else : 
-            compteur_voiture = 0
-            fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture)
+        # Si une place est disponible mettre 1 sur l'afficheur sinon non
+        while True: 
+            if fonction0x10(port_serial, nom_appareil_SP3) == True :
+                compteur_voiture = 1
+                fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture)
+            else : 
+                compteur_voiture = 0
+                fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture)
