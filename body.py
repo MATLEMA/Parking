@@ -17,18 +17,20 @@ def script_bouton() :
         combobox_baudrate["state"] = "disabled"
         combobox_timeout["state"] = "disabled"
         bouton_connecter["state"] = "disabled"
+        connexion.geometry("330x170")
     else : 
         messagebox.showwarning(title= "Erreur",
                                message= "Le port n'est pas ouvert")
         
 connexion = Tk()
-connexion.geometry("300x200")
+connexion.geometry("165x170")
 connexion.resizable(False, False)
 connexion.title("Parking")
 
 port_disponible = listing_port()
 combobox_port = ttk.Combobox(connexion, values = port_disponible, state= "readonly")
-combobox_port.set(port_disponible[0])
+if port_disponible != [] : 
+    combobox_port.set(port_disponible[0])
 combobox_port.grid(row=0, column=0, padx=10, pady=10)
 
 baudrate_disponible = ["4800", "9600", "19200" ]
