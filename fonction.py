@@ -137,7 +137,7 @@ def detection_appareil() :
             if modele_appareil is not None :
                 version_appareil = reponse_appareil[4:6]
                 version_appareil = int(version_appareil, 16)/10                                            # 0x1A = 10 (decimal) = version 1.0
-                nouvel_appareil = ma_class.Appareil(port, modele_appareil, version_appareil, test_ping)
+                nouvel_appareil = ma_class.Appareil(port_serial, modele_appareil, version_appareil, test_ping)
                 dictionnaire_appareils[nouvel_appareil.modele] = str(test_ping)
 
         for x in range(0,256):
@@ -160,7 +160,7 @@ def detection_appareil() :
             if modele_appareil is not None :
                 version_appareil = reponse_appareil[6:8]
                 version_appareil = int(version_appareil, 16)/10                                            # 0x1A = 10 (decimal) = version 1.0
-                nouvel_appareil = ma_class.Appareil(port, modele_appareil, version_appareil, test_ping_4)
+                nouvel_appareil = ma_class.Appareil(port_serial, modele_appareil, version_appareil, test_ping_4)
                 dictionnaire_appareils[nouvel_appareil.modele] = str(test_ping_4)
 
     return dictionnaire_appareils
@@ -198,7 +198,7 @@ def fonction0x01(port_serial, adresse_appareil) :
     La trame reçu est de 2 octets 
     '''
     fonction = "01"
-    bcc = hex(int(adresse_appareil[0:4], 16) + int(adresse_appareil[2:4], 16)+ int(fonction, 16))[2:]
+    bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16)+ int(fonction, 16))[2:]
     trame = bytes.fromhex(adresse_appareil + fonction + bcc)
     port_serial.write(trame)
     reponse_appareil = port_serial.read(2).hex()
@@ -215,7 +215,7 @@ def fonction0x02(port_serial, adresse_appareil) :
     La trame reçu est de 2 octets 
     '''
     fonction = "02"
-    bcc = hex(int(adresse_appareil[0:4], 16) + int(adresse_appareil[2:4], 16)+ int(fonction, 16))[2:] 
+    bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16)+ int(fonction, 16))[2:] 
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
     port_serial.write(trame)
     reponse_appareil = port_serial.read(2).hex()
@@ -234,7 +234,7 @@ def fonction0x03(port_serial, adresse_appareil) :
     Si l'apprareil est en mode réception/transmission : True
     '''
     fonction = "03"
-    bcc = hex(int(adresse_appareil[0:4], 16) + int(adresse_appareil[2:4], 16)+ int(fonction, 16))[2:]
+    bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16)+ int(fonction, 16))[2:]
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
     port_serial.write(trame)
     reponse_appareil = port_serial.read(4).hex()
