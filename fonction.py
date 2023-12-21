@@ -22,7 +22,7 @@ def connecter(port, baudrate, timeout):
         port_serial = serial.Serial(port, baudrate, timeout= timeout)
         messagebox.showinfo(title= "Succès",
                             message= "Succès"
-        )
+                            )
         return True
     except serial.SerialException :
         return False
@@ -99,69 +99,68 @@ def detection_appareil() :
     Elle ne prend rien en entrée
     Elle sortira un dictionnaire de type dict[str, str] = {"SP3": "4F"}\n
     Cette fonction est EXTREMEMENT LOURDE pour le reseau 
-    Il lui faudra au minimum 200s 65535*3*10^-3= 196s
     Cette fonction est dérivé de la fonction0x05
     '''
     # Constantes
-    dictionnaire_nom_hexa: dict[str,str] = {"SP1": "02", "D3": "02", "MR4/dp": "0x23", "D4": "0x2E", "DX2-VMS": "0x3B", "DX4-VMS": "0x3D", "DXCA": "0x44", "SP2": "0x1D", "DX3": "0x1E", "DX2": "0x2D", "SP3": "0x2B", "DX3-VMS": "0x3C", "DX-VMS-F": "0x3E", "GS24x8RGB": "0x3F"}
+    database_modele_hexa: dict[str,str] = {"SP1": "02", "D3": "02", "MR4/dp": "0x23", "D4": "0x2E", "DX2-VMS": "0x3B", "DX4-VMS": "0x3D", "DXCA": "0x44", "SP2": "0x1D", "DX3": "0x1E", "DX2": "0x2D", "SP3": "0x2B", "DX3-VMS": "0x3C", "DX-VMS-F": "0x3E", "GS24x8RGB": "0x3F"}
     fonction = "05"
     
     # Variables
-    dictionnaire_appareils : dict[str, str] = {}
+    dictionnaire_appareils = {}
     
     # Pour la nomenclature des appareils 
-    nombre_appareil = 1                                             
+    nombre_objet = 0                                           
     modele_appareil = None
 
     for i in range(0,256) :
 
         # Variables
-        test_ping = hex(i)[2:]
+        test_ping_2 = hex(i)[2:]
 
-        bcc = hex(int(test_ping, 16) + int(fonction, 16))[2:]
-        trame = bytes.fromhex(str(test_ping + fonction + bcc))
+        bcc = hex(int(test_ping_2, 16) + int(fonction, 16))[2:]
+        trame = bytes.fromhex(str(test_ping_2 + fonction + bcc))
         port_serial.write(trame)
         reponse_appareil = port_serial.read(4).hex()
-        if reponse_appareil == "" :
-            continue
-        else : 
-            modele_appareil_hexa = reponse_appareil[2:4]   
-            # 
-            for cle, valeur in dictionnaire_nom_hexa.items() :
-                if modele_appareil_hexa == valeur:
-                    modele_appareil= cle
-                    nombre_appareil += 1
+
+        if reponse_appareil != "" :
+            reponse_modele_appareil = reponse_appareil[2:4]
+            for cle, valeur in database_modele_hexa.items() :
+                if reponse_modele_appareil != valeur:
+                    pass
+                else :
+                    modele_appareil = cle
+                    # Détection de la version de l'objet
+                    version_appareil = reponse_appareil[4:6]
+                    # 0x1A = 10 (decimal) = version 1.0
+                    version_appareil = int(version_appareil, 16)/10
+
+                    dictionnaire_appareils[f"Object_{nombre_objet+1}"] = ma_class.Appareil(port_serial, modele_appareil, version_appareil, test_ping_2)
                     break
-                
-            # Détection de la version de l'objet
-            if modele_appareil is not None :
-                version_appareil = reponse_appareil[4:6]
-                version_appareil = int(version_appareil, 16)/10                                            # 0x1A = 10 (decimal) = version 1.0
-                nouvel_appareil = ma_class.Appareil(port_serial, modele_appareil, version_appareil, test_ping)
-                dictionnaire_appareils[nouvel_appareil.modele] = str(test_ping)
+
 
         for x in range(0,256):
-            test_ping_4 = test_ping + hex(x)[2:]
+
+            test_ping_4 = test_ping_2 + hex(x)[2:]
+
             bcc = hex(int(test_ping_4[0:2], 16) + int(test_ping_4[2:4], 16) + int(fonction, 16))[2:]
             trame = bytes.fromhex(str(test_ping_4 + fonction + bcc))
             port_serial.write(trame)
             reponse_appareil = port_serial.read(5).hex()
-            if reponse_appareil == "" :
-                continue
-            else :  
-                modele_appareil_hexa = reponse_appareil[4:6]   
-                for cle, valeur in dictionnaire_nom_hexa.items() :
-                    if modele_appareil_hexa == valeur:
-                        modele_appareil= cle
-                        nombre_appareil += 1
+
+            if reponse_appareil != "" :
+                reponse_modele_appareil = reponse_appareil[4:6]
+                for cle, valeur in database_modele_hexa.items() :
+                    if reponse_modele_appareil != valeur:
+                        pass
+                    else :
+                        modele_appareil = cle
+                        # Détection de la version de l'objet
+                        version_appareil = reponse_appareil[6:8]
+                        # 0x1A = 10 (decimal) = version 1.0
+                        version_appareil = int(version_appareil, 16)/10
+
+                        dictionnaire_appareils[f"Object_{nombre_objet+1}"] = ma_class.Appareil(port_serial, modele_appareil, version_appareil, test_ping_4)
                         break
-                
-            # Détection de la version de l'objet
-            if modele_appareil is not None :
-                version_appareil = reponse_appareil[6:8]
-                version_appareil = int(version_appareil, 16)/10                                            # 0x1A = 10 (decimal) = version 1.0
-                nouvel_appareil = ma_class.Appareil(port_serial, modele_appareil, version_appareil, test_ping_4)
-                dictionnaire_appareils[nouvel_appareil.modele] = str(test_ping_4)
 
     return dictionnaire_appareils
 
