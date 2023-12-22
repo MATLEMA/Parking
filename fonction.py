@@ -128,7 +128,7 @@ def detection_appareil(port_serial) :
             bcc = format(somme, "04X")
         else  :
             bcc = format(somme, "06X")
-            
+
         print(test_ping_2_formate+fonction+bcc)
         trame = bytes.fromhex(str(test_ping_2_formate + fonction + bcc))
         port_serial.write(trame)
@@ -333,9 +333,6 @@ def fonction0x05(port_serial, adresse_appareil) :
         version_appareil = reponse_appareil[6:8]
         version_appareil = int(version_appareil, 16)/10
         return nom_appareil, version_appareil, True
-
-    else : 
-        sys.exit("Il y a eu une erreur !")
 
 # Retourne la distance de détection maximal du capteur
 def fonction0x06(port_serial, adresse_appareil) :

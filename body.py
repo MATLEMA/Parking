@@ -1,11 +1,12 @@
-from tkinter import *
-from tkinter import ttk,messagebox, Tk
+from tkinter import ttk,messagebox, Tk, Frame, Listbox
 from fonction import listing_port, connecter, detection_appareil, thread
 import serial
 from threading import Thread
 
 # https://tkdocs.com/tutorial/index.html
 # https://docs.python.org/3/library/tkinter.ttk.html#widget
+
+
 
 
 def script_bouton() :
@@ -39,7 +40,8 @@ def liste_des_objets() :
     liste.grid(row=0, column= 1, rowspan= 4)
 
     if liste.bind("<<ListboxSelect>>", eee) == "SP3" :
-        pass
+        fenetre_parametres_objet = Frame(connexion)
+        fenetre_parametres_objet.grid(row=0, column=3, rowspan=10, padx=10, pady=10)
 
     elif liste.bind("<<ListboxSelect>>", eee) == "DX3" :
         pass
