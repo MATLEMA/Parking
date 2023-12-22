@@ -2,6 +2,7 @@ import serial
 import serial.tools.list_ports
 import ma_class
 from tkinter import messagebox
+from threading import Thread
 
 # Variables : 
 port : str                              # Dossier du port COM sélectionné
@@ -11,6 +12,10 @@ timeout : float                         # Timeout port
 ############################################################################################################################################################################
 
 # Fonction uniquement pour body.py
+
+def thread(fonction) : 
+    thread = Thread(target=fonction)
+    thread.start()
 
 # Teste si le port est ouvert 
 def connecter(port, baudrate, timeout):
