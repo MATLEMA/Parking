@@ -1,0 +1,3 @@
+# Les versions suivantes sont les versions actuelle que j'utilise 
+
+pyserial >= 3.5

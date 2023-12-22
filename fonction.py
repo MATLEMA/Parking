@@ -1,6 +1,5 @@
 import serial
 import serial.tools.list_ports
-import sys
 import ma_class
 from tkinter import messagebox
 
@@ -93,7 +92,7 @@ def test_port_ouvert() :
     return port, baudrate, timeout, port_serial
 
 # Détection automatique de tous les appareils connectés en réseau serie
-def detection_appareil() :
+def detection_appareil(port_serial) :
     '''
     Ceci est une fonction permettant de détecter tout les appareils sur le réseau serie
     Elle ne prend rien en entrée
@@ -103,7 +102,7 @@ def detection_appareil() :
     '''
     # Constantes
     database_modele_hexa: dict[str,str] = {"SP1": "02", "D3": "02", "MR4/dp": "0x23", "D4": "0x2E", "DX2-VMS": "0x3B", "DX4-VMS": "0x3D", "DXCA": "0x44", "SP2": "0x1D", "DX3": "0x1E", "DX2": "0x2D", "SP3": "0x2B", "DX3-VMS": "0x3C", "DX-VMS-F": "0x3E", "GS24x8RGB": "0x3F"}
-    fonction = "05"
+    fonction : str = "05"
     
     # Variables
     dictionnaire_appareils = {}
@@ -115,10 +114,18 @@ def detection_appareil() :
     for i in range(0,256) :
 
         # Variables
-        test_ping_2 = hex(i)[2:]
+        test_ping_2_formate = format(i, '02X')
 
-        bcc = hex(int(test_ping_2, 16) + int(fonction, 16))[2:]
-        trame = bytes.fromhex(str(test_ping_2 + fonction + bcc))
+        somme = int(test_ping_2_formate, 16) + int(fonction, 16)
+        if somme < 255 :
+            bcc = format(somme, "02X")
+        elif somme < 65025 :
+            bcc = format(somme, "04X")
+        else  :
+            bcc = format(somme, "06X")
+            
+        print(test_ping_2_formate+fonction+bcc)
+        trame = bytes.fromhex(str(test_ping_2_formate + fonction + bcc))
         port_serial.write(trame)
         reponse_appareil = port_serial.read(4).hex()
 
@@ -134,16 +141,24 @@ def detection_appareil() :
                     # 0x1A = 10 (decimal) = version 1.0
                     version_appareil = int(version_appareil, 16)/10
 
-                    dictionnaire_appareils[f"Object_{nombre_objet+1}"] = ma_class.Appareil(port_serial, modele_appareil, version_appareil, test_ping_2)
+                    dictionnaire_appareils[f"Object_{nombre_objet+1}"] = ma_class.Appareil(port_serial, modele_appareil, version_appareil, test_ping_2_formate)
                     break
 
 
         for x in range(0,256):
 
-            test_ping_4 = test_ping_2 + hex(x)[2:]
+            test_ping_4 = format(x, '02X')
+            test_ping_4_formate = test_ping_2_formate + test_ping_4
 
-            bcc = hex(int(test_ping_4[0:2], 16) + int(test_ping_4[2:4], 16) + int(fonction, 16))[2:]
-            trame = bytes.fromhex(str(test_ping_4 + fonction + bcc))
+            somme = int(test_ping_4_formate[0:2], 16) + int(test_ping_4_formate[2:4], 16) + int(fonction, 16)
+            if somme < 255 :
+                bcc = format(somme, "02X")
+            elif somme < 65025 :
+                bcc = format(somme, "04X")
+            else  :
+                bcc = format(somme, "06X")
+            print(test_ping_4_formate+fonction+bcc)
+            trame = bytes.fromhex(test_ping_4_formate + fonction + bcc)
             port_serial.write(trame)
             reponse_appareil = port_serial.read(5).hex()
 
@@ -664,6 +679,7 @@ if __name__ == "__main__" :
     
     port, baudrate, timeout, port_serial = test_port_ouvert()
     with port_serial :
+        detection_appareil(port_serial)
         # Variables
         nom_appareil_SP3 : str
         nom_appareil_DX3 : str

@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk,messagebox, Tk
-from fonction import listing_port, connecter
+from fonction import listing_port, connecter, detection_appareil
 import serial
 from time import sleep
 
@@ -21,17 +21,19 @@ def script_bouton() :
         fenetre.geometry("330x190")
         fenetre.resizable(False, True)
         port_serial = serial.Serial(port, int(baudrate), timeout= float(timeout))
-        liste_des_objets()
+        liste_des_objets(port_serial)
         return port_serial
     else : 
         messagebox.showwarning(title= "Erreur",
                                message= "Le port n'est pas ouvert")
         
-def liste_des_objets() :
+def liste_des_objets(port_serial) :
     def eee(event):
+        detection_appareil(port_serial)
         fenetre.geometry("500x300")
         fenetre_boutons = Frame(fenetre)
-        fenetre_boutons.grid(row= 0, column= 2, padx=10, pady=10)
+        fenetre_boutons.grid(row= 0, column= 2
+                             , padx=10, pady=10)
         if liste.get(liste.curselection()) == "test0" :   
             for widget in fenetre_boutons.winfo_children():
                 widget.destroy()
