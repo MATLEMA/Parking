@@ -91,7 +91,7 @@ def test_port_ouvert() :
         # Vérification si le port est ouvert 
         # Si oui les variables seront stockées
         try :
-            port_serial = serial.Serial(port, baudrate=baudrate, write_timeout=timeout, timeout=timeout)
+            port_serial = serial.Serial(port, baudrate=baudrate, write_timeout=0, timeout=timeout)
             break
         except serial.SerialException :
             print(f"Le port {port} n'est pas ouvert réessayer avec un autre port ou verifier votre installation !")
@@ -116,6 +116,7 @@ def detection_appareil(port_serial) :
     # Pour la nomenclature des appareils 
     nombre_objet = 0                                           
     modele_appareil = None
+    reponse_appareil = ""
 
     for i in range(0,256) :
         
@@ -133,7 +134,9 @@ def detection_appareil(port_serial) :
         print(test_ping_2_formate+fonction+bcc)
         trame = bytes.fromhex(str(test_ping_2_formate + fonction + bcc))
         port_serial.write(trame)
-        reponse_appareil = "00000"
+
+        if port_serial.in_waiting > 0:
+            reponse_appareil = port_serial.read(port_serial.in_waiting)
 
         if reponse_appareil != "" :
             reponse_modele_appareil = reponse_appareil[2:4]
@@ -165,15 +168,9 @@ def detection_appareil(port_serial) :
             print(test_ping_4_formate+fonction+bcc)
             trame = bytes.fromhex(test_ping_4_formate + fonction + bcc)
             port_serial.write(trame)
-
-            if nombre_objet == 0 :
-                port_serial.write(b"03CA05D2")
-                input()
-
                 
             if port_serial.in_waiting > 0:
                 reponse_appareil = port_serial.read(port_serial.in_waiting)
-                print(reponse_appareil)
 
             if reponse_appareil != "" :
                 reponse_modele_appareil = reponse_appareil[4:6]
