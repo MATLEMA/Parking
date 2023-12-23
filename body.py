@@ -22,7 +22,7 @@ def script_bouton() :
         bouton_connecter["state"] = "disabled"
         fenetre.geometry("330x190")
         fenetre.resizable(False, True)
-        port_serial = serial.Serial(port, int(baudrate), timeout= float(timeout))
+        port_serial = serial.Serial(port, int(baudrate), write_timeout= float(timeout))
         liste_des_objets()
         return port_serial
     else : 

@@ -6,3 +6,5 @@ class Appareil:
             self.modele = modele
             self.version = version
             self.adresse = adresse
+        
+        #if self.self== "SP3" :  

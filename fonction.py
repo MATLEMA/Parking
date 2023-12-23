@@ -3,6 +3,7 @@ import serial.tools.list_ports
 import ma_class
 from tkinter import messagebox
 from threading import Thread
+from time import sleep
 
 # Variables : 
 port : str                              # Dossier du port COM sélectionné
@@ -90,7 +91,7 @@ def test_port_ouvert() :
         # Vérification si le port est ouvert 
         # Si oui les variables seront stockées
         try :
-            port_serial = serial.Serial(port, baudrate=baudrate, timeout=timeout)
+            port_serial = serial.Serial(port, baudrate=baudrate, write_timeout=timeout, timeout=timeout)
             break
         except serial.SerialException :
             print(f"Le port {port} n'est pas ouvert réessayer avec un autre port ou verifier votre installation !")
@@ -117,7 +118,7 @@ def detection_appareil(port_serial) :
     modele_appareil = None
 
     for i in range(0,256) :
-
+        
         # Variables
         test_ping_2_formate = format(i, '02X')
 
@@ -132,7 +133,7 @@ def detection_appareil(port_serial) :
         print(test_ping_2_formate+fonction+bcc)
         trame = bytes.fromhex(str(test_ping_2_formate + fonction + bcc))
         port_serial.write(trame)
-        reponse_appareil = port_serial.read(4).hex()
+        reponse_appareil = "00000"
 
         if reponse_appareil != "" :
             reponse_modele_appareil = reponse_appareil[2:4]
@@ -151,7 +152,6 @@ def detection_appareil(port_serial) :
 
 
         for x in range(0,256):
-
             test_ping_4 = format(x, '02X')
             test_ping_4_formate = test_ping_2_formate + test_ping_4
 
@@ -165,7 +165,15 @@ def detection_appareil(port_serial) :
             print(test_ping_4_formate+fonction+bcc)
             trame = bytes.fromhex(test_ping_4_formate + fonction + bcc)
             port_serial.write(trame)
-            reponse_appareil = port_serial.read(5).hex()
+
+            if nombre_objet == 0 :
+                port_serial.write(b"03CA05D2")
+                input()
+
+                
+            if port_serial.in_waiting > 0:
+                reponse_appareil = port_serial.read(port_serial.in_waiting)
+                print(reponse_appareil)
 
             if reponse_appareil != "" :
                 reponse_modele_appareil = reponse_appareil[4:6]
@@ -181,7 +189,7 @@ def detection_appareil(port_serial) :
 
                         dictionnaire_appareils[f"Object_{nombre_objet+1}"] = ma_class.Appareil(port_serial, modele_appareil, version_appareil, test_ping_4)
                         break
-
+    print(nombre_objet*900)
     return dictionnaire_appareils
 
 ############################################################################################################################################################################
@@ -681,7 +689,7 @@ if __name__ == "__main__" :
     
     port, baudrate, timeout, port_serial = test_port_ouvert()
     with port_serial :
-        detection_appareil(port_serial)
+        print(detection_appareil(port_serial))
         # Variables
         nom_appareil_SP3 : str
         nom_appareil_DX3 : str
