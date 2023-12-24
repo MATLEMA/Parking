@@ -1,13 +1,16 @@
-from tkinter import ttk,messagebox, Tk, Frame, Listbox, Toplevel
-from fonction import listing_port, connecter, detection_appareil, thread
+from tkinter import ttk,messagebox, Tk, Frame, Listbox, LabelFrame
+from fonction import listing_port, connecter
 import serial
 
 class Configuration(Frame) :
     def __init__(self,parent) :
         super().__init__(parent)
 
-        liste = Listbox(parent)
-        liste.grid(row=0, column= 1, rowspan= 4, columnspan= 3)
+        self.configuration = LabelFrame(parent, text= "Configuration")
+        self.configuration.pack(side="left", expand=False, fill= "y",anchor= "n", ipady= 50, ipadx= 50)
+
+        liste = Listbox(self.configuration)
+        liste.pack(side="left", expand=True, fill= "both")
 
 class Connexion(Frame) :
     
@@ -16,8 +19,8 @@ class Connexion(Frame) :
     def __init__(self, parent) :
     
         self.parent = parent
-        self.fenetre_connexion = Frame(self.parent)
-        self.fenetre_connexion.grid(row=0, column=0)
+        self.fenetre_connexion = LabelFrame(self.parent, text= "Connexion port COM")
+        self.fenetre_connexion.pack(side="left", expand= False, anchor= "nw")
 
         port_disponible = listing_port()
         self.combobox_port = ttk.Combobox(self.fenetre_connexion, values = port_disponible, state= "readonly")
@@ -35,10 +38,11 @@ class Connexion(Frame) :
         self.combobox_timeout.set(timeout_disponible[0])
         self.combobox_timeout.grid(row=2, column=0, padx=10, pady=10)
 
-        self.bouton_connecter = ttk.Button(self.fenetre_connexion, text="Connecter", command= self.script_bouton)
+        self.bouton_connecter = ttk.Button(self.fenetre_connexion, text="Connecter", command= self.script_bouton_connexion)
         self.bouton_connecter.grid(row=3, column=0, padx=10, pady=10)
+        Configuration(self.parent)
 
-    def script_bouton(self) :
+    def script_bouton_connexion(self) :
         
         port = self.combobox_port.get()
         baudrate = self.combobox_baudrate.get()
@@ -48,25 +52,33 @@ class Connexion(Frame) :
             self.combobox_port["state"] = "disabled"
             self.combobox_baudrate["state"] = "disabled"
             self.combobox_timeout["state"] = "disabled"
-            self.bouton_connecter["state"] = "disabled"
             serial.Serial(port, int(baudrate), timeout= float(timeout))
-            self.Changement_de_fenetre()
-
-
+            self.deconnexion_bouton()
         else : 
             messagebox.showwarning(title= "Erreur",
                                     message= "Le port n'est pas ouvert")
-    def Changement_de_fenetre(self) :
 
-        self.fenetre_connexion.grid_forget()
-            
-        Configuration(self.parent)
+    def deconnexion_bouton(self) :
 
+        self.bouton_connecter = ttk.Button(self.fenetre_connexion, text="Deconnecter", command=self.script_bouton_deconnexion)
+        self.bouton_connecter.grid(row=3, column=0, padx=10, pady=10)
+    
+    def script_bouton_deconnexion(self) :
+
+        self.combobox_port["state"] = "enabled"
+        self.combobox_baudrate["state"] = "enabled"
+        self.combobox_timeout["state"] = "enabled"
+        self.bouton_connecter = ttk.Button(self.fenetre_connexion, text="Connecter", command= self.script_bouton_connexion)
+        self.bouton_connecter.grid(row=3, column=0, padx=10, pady=10)
 
 class Main() :
     def __init__(self) :
         root = Tk()
 
+        root.geometry("400x400")
+        root.resizable(False, False)
+        root.title("Parking")
+        
         # Appellation des widgets 
         application = Connexion(root)
 

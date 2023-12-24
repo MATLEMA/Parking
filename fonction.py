@@ -25,9 +25,6 @@ def connecter(port, baudrate, timeout):
 
     try :
         port_serial = serial.Serial(port, baudrate, timeout= timeout)
-        messagebox.showinfo(title= "Succès",
-                            message= "Succès"
-                            )
         return True
     except serial.SerialException :
         return False
