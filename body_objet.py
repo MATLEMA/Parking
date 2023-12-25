@@ -1,26 +1,42 @@
-from tkinter import ttk,messagebox, Tk, Frame, Listbox, LabelFrame
+from tkinter import ttk,messagebox, Tk, Listbox, LabelFrame, Variable
 from fonction import listing_port, connecter
 import serial
+from ma_class import Appareil
 
-class Configuration(Frame) :
+class Configuration(Tk) :
+
+    liste_des_objets : dict[str,list[str]] = {}
+
     def __init__(self,parent) :
-        super().__init__(parent)
 
         self.configuration = LabelFrame(parent, text= "Configuration")
         self.configuration.pack(side="left", expand=False, fill= "y",anchor= "n", ipady= 50, ipadx= 50)
 
-        liste = Listbox(self.configuration)
+        self.variable_pour_liste = Variable()
+        liste = Listbox(self.configuration, listvariable= self.variable_pour_liste)
         liste.pack(side="left", expand=True, fill= "both")
 
-class Connexion(Frame) :
-    
-    ancienne_fenetre = None
+    def ajout_liste(self, objet : Appareil) :
+        
+        self.liste_des_objets[objet.port_serial] = [objet.modele, objet.adresse, str(objet.version)]
+        self.maj_listbox()
+
+    def maj_listbox(self):
+
+        self.variable_pour_liste.set(list(list(self.liste_des_objets.values())[0])[0])
+
+    def changement_de_port(self) :
+
+        self.liste_des_objets.clear
+        
+
+class Connexion(Tk) :
     
     def __init__(self, parent) :
-    
+
         self.parent = parent
-        self.fenetre_connexion = LabelFrame(self.parent, text= "Connexion port COM")
-        self.fenetre_connexion.pack(side="left", expand= False, anchor= "nw")
+        self.fenetre_connexion = LabelFrame(self.parent, text= "Connexion Port COM")
+        self.fenetre_connexion.pack(side="left", anchor= "nw")
 
         port_disponible = listing_port()
         self.combobox_port = ttk.Combobox(self.fenetre_connexion, values = port_disponible, state= "readonly")
@@ -40,7 +56,6 @@ class Connexion(Frame) :
 
         self.bouton_connecter = ttk.Button(self.fenetre_connexion, text="Connecter", command= self.script_bouton_connexion)
         self.bouton_connecter.grid(row=3, column=0, padx=10, pady=10)
-        Configuration(self.parent)
 
     def script_bouton_connexion(self) :
         
@@ -68,10 +83,11 @@ class Connexion(Frame) :
         self.combobox_port["state"] = "enabled"
         self.combobox_baudrate["state"] = "enabled"
         self.combobox_timeout["state"] = "enabled"
+        
         self.bouton_connecter = ttk.Button(self.fenetre_connexion, text="Connecter", command= self.script_bouton_connexion)
         self.bouton_connecter.grid(row=3, column=0, padx=10, pady=10)
 
-class Main() :
+class Main :
     def __init__(self) :
         root = Tk()
 
@@ -80,7 +96,8 @@ class Main() :
         root.title("Parking")
         
         # Appellation des widgets 
-        application = Connexion(root)
+        self.application_connexion = Connexion(root)
+        self.application_configuration = Configuration(root)
 
         root.mainloop()
 

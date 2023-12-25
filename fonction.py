@@ -1,9 +1,7 @@
 import serial
 import serial.tools.list_ports
-import ma_class
-from tkinter import messagebox
 from threading import Thread
-from time import sleep
+from ma_class import Appareil
 
 # Variables : 
 port : str                              # Dossier du port COM sélectionné
@@ -147,7 +145,7 @@ def detection_appareil(port_serial) :
                     # 0x1A = 10 (decimal) = version 1.0
                     version_appareil = int(version_appareil, 16)/10
 
-                    dictionnaire_appareils[f"Object_{nombre_objet+1}"] = ma_class.Appareil(port_serial, modele_appareil, version_appareil, test_ping_2_formate)
+                    dictionnaire_appareils[f"Object_{nombre_objet+1}"] = Appareil(port_serial, modele_appareil, version_appareil, test_ping_2_formate)
                     break
 
 
@@ -181,7 +179,7 @@ def detection_appareil(port_serial) :
                         # 0x1A = 10 (decimal) = version 1.0
                         version_appareil = int(version_appareil, 16)/10
 
-                        dictionnaire_appareils[f"Object_{nombre_objet+1}"] = ma_class.Appareil(port_serial, modele_appareil, version_appareil, test_ping_4)
+                        dictionnaire_appareils[f"Object_{nombre_objet+1}"] = Appareil(port_serial, modele_appareil, version_appareil, test_ping_4)
                         break
     print(nombre_objet*900)
     return dictionnaire_appareils
