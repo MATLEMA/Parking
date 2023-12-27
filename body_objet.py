@@ -1,4 +1,4 @@
-from tkinter import ttk,messagebox, Tk, Listbox, LabelFrame, Variable, StringVar, Entry
+from tkinter import ttk,messagebox, Tk, Listbox, LabelFrame, Variable, StringVar, Entry, Label
 from fonction import listing_port, connecter
 import serial
 from ma_class import Appareil
@@ -35,15 +35,14 @@ class Configuration(Tk) :
         self.configuration.pack(side="left", expand=False, fill= "y",anchor= "n", ipady= 50, ipadx= 50)
 
         self.variable_pour_liste = Variable()
-        liste = Listbox(self.configuration, listvariable= self.variable_pour_liste)
-        liste.pack(side="left", expand=True, fill= "both")
-        self.selectionner = liste.curselection()
+        self.liste = Listbox(self.configuration, listvariable= self.variable_pour_liste)
+        self.liste.pack(side="left", expand=True, fill= "both")
 
         self.ajout_liste(Appareil("COM1", "SP3", 1.0, "4F31"))
 
         self.ajout_liste(Appareil("COM1", "SP4", 1.0, "4F32"))
 
-        liste.bind("<<ListboxSelect>>", self.objet_selectionner)
+        self.liste.bind("<<ListboxSelect>>", self.objet_selectionner)
 
         self.configuration_objet = LabelFrame(self.parent, text= "Configuration de l'objet :")
         self.configuration_objet.pack(side="left", expand=False, anchor="n")
@@ -63,19 +62,33 @@ class Configuration(Tk) :
 
     def objet_selectionner(self, evenement) :
 
+        port_objet = self.liste.selection_get()
         self.nettoyer_widgets()
+        print(port_objet)
     
         redefinir_fenetre(self.parent, 795, 400)
 
-        port_objet = self.selectionner
-        port_objet = StringVar()
-        afficher_port_com = Entry(self.configuration_objet, textvariable= port_objet)
-        afficher_port_com.grid()
-    
+
+        label_port_com = Label(self.configuration_objet, text= "Port COM de l'objet :")
+        label_port_com.grid()
+        afficher_port_com = Entry(self.configuration_objet)
+        afficher_port_com.insert(0, port_objet)
+        afficher_port_com.grid(padx= 10)
+        afficher_port_com["state"] = "disabled"
+
+        label_version_objet = Label(self.configuration_objet, text= "Version logiciel de l'objet :")
+        label_version_objet.grid()
+        afficher_modele_objet = Entry(self.configuration_objet)
+        afficher_modele_objet.insert(0, self.liste_des_objets[port_objet][0])
+        afficher_modele_objet.grid()
+        afficher_modele_objet["state"] = "disabled"
+
     def nettoyer_widgets(self) :
 
         for enfant in self.configuration_objet.winfo_children():
             enfant.destroy()
+
+            
 
 
 
