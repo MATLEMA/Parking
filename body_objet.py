@@ -6,8 +6,9 @@ from ma_class import Appareil
 
 # Variables
 
-longeur = 395
-largeur = 400
+is_connecter = False
+longeur = 185
+largeur = 165
 
 def centrer_fenetre(parent, longeur_fenetre : int, hauteur_fenetre: int) :
 
@@ -72,30 +73,40 @@ class Configuration(Tk) :
         label_port_com = Label(self.configuration_objet, text= "Port COM de l'objet :")
         label_port_com.grid()
         afficher_port_com = Entry(self.configuration_objet)
-        afficher_port_com.insert(0, port_objet)
+        afficher_port_com.insert(0, self.liste_des_objets[port_objet][1])
         afficher_port_com.grid(padx= 10)
         afficher_port_com["state"] = "disabled"
 
-        label_version_objet = Label(self.configuration_objet, text= "Version logiciel de l'objet :")
-        label_version_objet.grid()
+        label_modele_objet = Label(self.configuration_objet, text= "Modele de l'objet :")
+        label_modele_objet.grid()
         afficher_modele_objet = Entry(self.configuration_objet)
         afficher_modele_objet.insert(0, self.liste_des_objets[port_objet][0])
         afficher_modele_objet.grid()
         afficher_modele_objet["state"] = "disabled"
+
+        label_version_objet = Label(self.configuration_objet, text= "Version logiciel de l'objet :")
+        label_version_objet.grid()
+        afficher_version_objet = Entry(self.configuration_objet)
+        afficher_version_objet.insert(0, self.liste_des_objets[port_objet][2])
+        afficher_version_objet.grid()
+        afficher_version_objet["state"] = "disabled"
+
+        label_adresse_objet = Label(self.configuration_objet, text= "Adresse de l'objet :")
+        label_adresse_objet.grid()
+        afficher_adresse_objet = Entry(self.configuration_objet)
+        afficher_adresse_objet.insert(0, port_objet)
+        afficher_adresse_objet.grid()
+        afficher_adresse_objet["state"] = "disabled"
 
     def nettoyer_widgets(self) :
 
         for enfant in self.configuration_objet.winfo_children():
             enfant.destroy()
 
-            
+    def nouveau_port(self) : 
 
-
-
-
-        
-    
-        
+        self.configuration.destroy()
+        self.configuration_objet.destroy()
 
 class Connexion(Tk) :
     
@@ -135,6 +146,11 @@ class Connexion(Tk) :
             self.combobox_baudrate["state"] = "disabled"
             self.combobox_timeout["state"] = "disabled"
             serial.Serial(port, int(baudrate), timeout= float(timeout))
+
+            redefinir_fenetre(self.parent, 395, 400)
+
+            self.application_configuration = Configuration(self.parent)
+
             self.deconnexion_bouton()
         else : 
             messagebox.showwarning(title= "Erreur",
@@ -154,6 +170,12 @@ class Connexion(Tk) :
         self.bouton_connecter = ttk.Button(self.fenetre_connexion, text="Connecter", command= self.script_bouton_connexion)
         self.bouton_connecter.grid(row=3, column=0, padx=10, pady=10)
 
+        redefinir_fenetre(self.parent, largeur, longeur)
+
+        if hasattr(self, 'application_configuration'):
+            self.application_configuration.nouveau_port()
+        
+
 class Main :
     def __init__(self) :
         root = Tk()
@@ -165,7 +187,6 @@ class Main :
         
         # Appellation des widgets 
         self.application_connexion = Connexion(root)
-        self.application_configuration = Configuration(root)
 
         root.mainloop()
 
