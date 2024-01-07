@@ -1,7 +1,8 @@
 from tkinter import ttk,messagebox, Tk, Listbox, LabelFrame, Variable, StringVar, Entry, Label
-from fonction import listing_port, connecter
+from fonction import listing_port, connecter, detection_appareil
 import serial
 from ma_class import Appareil
+import threading
 
 
 # Variables
@@ -37,7 +38,7 @@ class Configuration(Tk) :
 
         self.variable_pour_liste = Variable()
         self.liste = Listbox(self.configuration, listvariable= self.variable_pour_liste)
-        self.liste.pack(side="left", expand=True, fill= "both")
+        self.liste.pack(side="top", expand=True, fill= "both")
 
         self.ajout_liste(Appareil("COM1", "SP3", 1.0, "4F31"))
 
@@ -47,6 +48,14 @@ class Configuration(Tk) :
 
         self.configuration_objet = LabelFrame(self.parent, text= "Configuration de l'objet :")
         self.configuration_objet.pack(side="left", expand=False, anchor="n")
+
+        # Ajout manuel d'adresse objet 
+
+        self.entree = Entry(self.configuration)
+        self.entree.pack(side= "bottom")
+        
+        self.adresse_entree = Label(self.configuration, text= " Veuillez inscrire l'adresse de l'objet :")
+        self.adresse_entree.pack(side= "bottom")
 
     def ajout_liste(self, objet : Appareil) :
         
@@ -65,34 +74,40 @@ class Configuration(Tk) :
 
         port_objet = self.liste.selection_get()
         self.nettoyer_widgets()
-        print(port_objet)
     
         redefinir_fenetre(self.parent, 795, 400)
 
-
+        # Port
         label_port_com = Label(self.configuration_objet, text= "Port COM de l'objet :")
         label_port_com.grid()
+
         afficher_port_com = Entry(self.configuration_objet)
         afficher_port_com.insert(0, self.liste_des_objets[port_objet][1])
         afficher_port_com.grid(padx= 10)
         afficher_port_com["state"] = "disabled"
 
+        # Modele
         label_modele_objet = Label(self.configuration_objet, text= "Modele de l'objet :")
         label_modele_objet.grid()
+
         afficher_modele_objet = Entry(self.configuration_objet)
         afficher_modele_objet.insert(0, self.liste_des_objets[port_objet][0])
         afficher_modele_objet.grid()
         afficher_modele_objet["state"] = "disabled"
 
+        # Version
         label_version_objet = Label(self.configuration_objet, text= "Version logiciel de l'objet :")
         label_version_objet.grid()
+
         afficher_version_objet = Entry(self.configuration_objet)
         afficher_version_objet.insert(0, self.liste_des_objets[port_objet][2])
         afficher_version_objet.grid()
         afficher_version_objet["state"] = "disabled"
 
+        # Adresse
         label_adresse_objet = Label(self.configuration_objet, text= "Adresse de l'objet :")
         label_adresse_objet.grid()
+
         afficher_adresse_objet = Entry(self.configuration_objet)
         afficher_adresse_objet.insert(0, port_objet)
         afficher_adresse_objet.grid()
@@ -142,10 +157,18 @@ class Connexion(Tk) :
         timeout = self.combobox_timeout.get()
 
         if connecter(port, baudrate, timeout) == True :
+            
+            port_actuelle = serial.Serial(port, int(baudrate), timeout= float(timeout))
+
+            # Lancement du Thread pour la détection automatique des appareils
+
+            self.stop_thread = True
+            self.detection_automatique_appareils = threading.Thread(target=detection_appareil, args=(port_actuelle, lambda: self.stop_thread), daemon= True)
+            self.detection_automatique_appareils.start()
+
             self.combobox_port["state"] = "disabled"
             self.combobox_baudrate["state"] = "disabled"
             self.combobox_timeout["state"] = "disabled"
-            serial.Serial(port, int(baudrate), timeout= float(timeout))
 
             redefinir_fenetre(self.parent, 395, 400)
 
@@ -163,6 +186,7 @@ class Connexion(Tk) :
     
     def script_bouton_deconnexion(self) :
 
+        self.stop_thread = True
         self.combobox_port["state"] = "enabled"
         self.combobox_baudrate["state"] = "enabled"
         self.combobox_timeout["state"] = "enabled"
@@ -172,7 +196,7 @@ class Connexion(Tk) :
 
         redefinir_fenetre(self.parent, largeur, longeur)
 
-        if hasattr(self, 'application_configuration'):
+        if hasattr(self, "application_configuration"):
             self.application_configuration.nouveau_port()
         
 

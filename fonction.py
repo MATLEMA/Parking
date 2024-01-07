@@ -1,7 +1,8 @@
 import serial
 import serial.tools.list_ports
-from threading import Thread
+import threading
 from ma_class import Appareil
+
 
 # Variables : 
 port : str                              # Dossier du port COM sélectionné
@@ -9,12 +10,6 @@ baudrate : int                          # Baudrate
 timeout : float                         # Timeout port
 
 ############################################################################################################################################################################
-
-# Fonction uniquement pour body.py
-
-def thread(fonction) : 
-    thread = Thread(target=fonction)
-    thread.start()
 
 # Teste si le port est ouvert 
 def connecter(port, baudrate, timeout):
@@ -93,14 +88,13 @@ def test_port_ouvert() :
     return port, baudrate, timeout, port_serial
 
 # Détection automatique de tous les appareils connectés en réseau serie
-def detection_appareil(port_serial) :
+def detection_appareil(port_serial, stop) -> dict[str, str]:
     '''
     Ceci est une fonction permettant de détecter tout les appareils sur le réseau serie
-    Elle ne prend rien en entrée
     Elle sortira un dictionnaire de type dict[str, str] = {"SP3": "4F"}\n
-    Cette fonction est EXTREMEMENT LOURDE pour le reseau 
     Cette fonction est dérivé de la fonction0x05
-    '''
+    ''' 
+    
     # Constantes
     database_modele_hexa: dict[str,str] = {"SP1": "02", "D3": "02", "MR4/dp": "0x23", "D4": "0x2E", "DX2-VMS": "0x3B", "DX4-VMS": "0x3D", "DXCA": "0x44", "SP2": "0x1D", "DX3": "0x1E", "DX2": "0x2D", "SP3": "0x2B", "DX3-VMS": "0x3C", "DX-VMS-F": "0x3E", "GS24x8RGB": "0x3F"}
     fonction : str = "05"
@@ -113,8 +107,13 @@ def detection_appareil(port_serial) :
     modele_appareil = None
     reponse_appareil = ""
 
+    if stop() : 
+        return dictionnaire_appareils
     for i in range(0,256) :
         
+        if stop() : 
+            return dictionnaire_appareils
+
         # Variables
         test_ping_2_formate = format(i, '02X')
 
@@ -148,7 +147,6 @@ def detection_appareil(port_serial) :
                     dictionnaire_appareils[f"Object_{nombre_objet+1}"] = Appareil(port_serial, modele_appareil, version_appareil, test_ping_2_formate)
                     break
 
-
         for x in range(0,256):
             test_ping_4 = format(x, '02X')
             test_ping_4_formate = test_ping_2_formate + test_ping_4
@@ -181,7 +179,9 @@ def detection_appareil(port_serial) :
 
                         dictionnaire_appareils[f"Object_{nombre_objet+1}"] = Appareil(port_serial, modele_appareil, version_appareil, test_ping_4)
                         break
+                    
     print(nombre_objet*900)
+
     return dictionnaire_appareils
 
 ############################################################################################################################################################################
@@ -681,7 +681,7 @@ if __name__ == "__main__" :
     
     port, baudrate, timeout, port_serial = test_port_ouvert()
     with port_serial :
-        print(detection_appareil(port_serial))
+        print(detection_appareil(port_serial, False))
         # Variables
         nom_appareil_SP3 : str
         nom_appareil_DX3 : str
