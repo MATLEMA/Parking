@@ -2,6 +2,7 @@ import serial
 import serial.tools.list_ports
 import threading
 from ma_class import Appareil
+from time import sleep
 
 
 # Variables : 
@@ -107,11 +108,11 @@ def detection_appareil(port_serial, stop) -> dict[str, str]:
     modele_appareil = None
     reponse_appareil = ""
 
-    if stop() : 
+    if stop == True : 
         return dictionnaire_appareils
     for i in range(0,256) :
         
-        if stop() : 
+        if stop == True : 
             return dictionnaire_appareils
 
         # Variables
@@ -590,9 +591,12 @@ def fonction0x1B(port_serial, adresse_appareil) :
     fonction = "1B"
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16))[2:] 
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
+    print(str(adresse_appareil + fonction + bcc))
     port_serial.write(trame)
-    reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
     
+    reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
+    return reponse_port
+
 ############################################################################################################################################################################
 
 # LES FONCTIONS SUIVANTES SONT POUR LA PLUPART UNIQUEMENT UTILISE PAR LES DX?
@@ -701,7 +705,7 @@ def fonction0x49(port_serial, adresse_appareil, direction : bool) :
     port_serial.write(trame)
     reponse_port = port_serial.read(2).hex()    # Voir si ça ne casse pas le script
 
-# Script combo capteur / display 
+""" # Script combo capteur / display 
 if __name__ == "__main__" :
     
     port, baudrate, timeout, port_serial = test_port_ouvert()
@@ -716,6 +720,8 @@ if __name__ == "__main__" :
         nom_appareil_SP3 = input("Veuillez saisir l'adresse du SP3 : ")
         nom_appareil_DX3 = input("Veuillez saisir l'adresse du DX3 : ")
 
+        print(fonction0x05(port_serial, nom_appareil_SP3))
+
         # Si une place est disponible mettre 1 sur l'afficheur sinon non
         while True: 
             if fonction0x10(port_serial, nom_appareil_SP3) == True :
@@ -723,4 +729,15 @@ if __name__ == "__main__" :
                 fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture)
             else : 
                 compteur_voiture = 0
-                fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture)
+                fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture) """
+
+if __name__ == "__main__" :
+
+    port, baudrate, timeout, port_serial = test_port_ouvert()
+    with port_serial :
+        print(fonction0x1B(port_serial, "1B53"))
+        sleep(1)
+        fonction0x1A(port_serial, "1B53")
+        sleep(1)
+        fonction0x19(port_serial, "1B53")
+        print("a")

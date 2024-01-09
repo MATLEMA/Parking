@@ -145,10 +145,12 @@ class Configuration(Tk) :
 
             if is_valid == True :
                 try :
-                    nom_appareil, version_appareil, e = fonction0x05(port_actuelle, str(adresse))
+                    nom_appareil, version_appareil, _ = fonction0x05(port_actuelle, str(adresse))
+                    self.ajout_liste(objet= Appareil(port, nom_appareil, version_appareil, adresse))
 
                 except NameError:
                     messagebox.showerror(title= "Erreur", message= "L'appareil n'a pas répondu !")
+        
 
 class Connexion(Tk) :
     
@@ -178,7 +180,8 @@ class Connexion(Tk) :
         self.bouton_connecter.grid(row=3, column=0, padx=10, pady=10)
 
     def script_bouton_connexion(self) :
-        
+
+        global port
         port = self.combobox_port.get()
         baudrate = self.combobox_baudrate.get()
         timeout = self.combobox_timeout.get()
@@ -186,7 +189,7 @@ class Connexion(Tk) :
         if connecter(port, baudrate, timeout) == True :
             
             global port_actuelle
-            port_actuelle = serial.Serial(port, int(baudrate), timeout= float(timeout))
+            port_actuelle = serial.Serial(port, int(baudrate), timeout= float(timeout), write_timeout= 0)
 
             # Lancement du Thread pour la détection automatique des appareils
 
