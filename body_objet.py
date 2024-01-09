@@ -1,5 +1,5 @@
-from tkinter import ttk,messagebox, Tk, Listbox, LabelFrame, Variable, StringVar, Entry, Label
-from fonction import listing_port, connecter, detection_appareil
+from tkinter import ttk,messagebox, Tk, Listbox, LabelFrame, Variable, Button, Entry, Label
+from fonction import listing_port, connecter, detection_appareil, fonction0x05
 import serial
 from ma_class import Appareil
 import threading
@@ -51,11 +51,15 @@ class Configuration(Tk) :
 
         # Ajout manuel d'adresse objet 
 
-        self.entree = Entry(self.configuration)
-        self.entree.pack(side= "bottom")
-        
         self.adresse_entree = Label(self.configuration, text= " Veuillez inscrire l'adresse de l'objet :")
-        self.adresse_entree.pack(side= "bottom")
+        self.adresse_entree.pack(side= "top", pady= 5)
+
+        self.entree = Entry(self.configuration)
+        self.entree.pack(side= "top")
+        
+        self.bouton_test_adresse_manuel = Button(self.configuration, text="Ajouter", command= self.ajout_manuel_objet)
+        self.bouton_test_adresse_manuel.pack(side= "top", pady= 5)
+        
 
     def ajout_liste(self, objet : Appareil) :
         
@@ -122,6 +126,29 @@ class Configuration(Tk) :
 
         self.configuration.destroy()
         self.configuration_objet.destroy()
+    
+    def ajout_manuel_objet(self) :
+        
+        adresse = self.entree.get()
+
+        if len(adresse) == 4 or len(adresse) == 2 :
+
+            try :
+                int(adresse, 16)
+                self.entree.delete(0, "end")
+                is_valid = True
+                    
+            except ValueError :
+                self.entree.delete(0, "end")
+                messagebox.showerror(title= "Erreur", message= "Entrer une valeur valide : 2 ou 4 charactères en hexa")
+                is_valid = False
+
+            if is_valid == True :
+                try :
+                    nom_appareil, version_appareil, e = fonction0x05(port_actuelle, str(adresse))
+
+                except NameError:
+                    messagebox.showerror(title= "Erreur", message= "L'appareil n'a pas répondu !")
 
 class Connexion(Tk) :
     
@@ -158,6 +185,7 @@ class Connexion(Tk) :
 
         if connecter(port, baudrate, timeout) == True :
             
+            global port_actuelle
             port_actuelle = serial.Serial(port, int(baudrate), timeout= float(timeout))
 
             # Lancement du Thread pour la détection automatique des appareils

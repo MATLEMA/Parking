@@ -288,7 +288,7 @@ def fonction0x04(port_serial, adresse_appareil) :
     return valeur
 
 # Recherche les informations d'un équipement (Nom de l'équipement | version)
-def fonction0x05(port_serial, adresse_appareil) :
+def fonction0x05(port_serial, adresse_appareil: str) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial ainsi que l'adresse_appareil
     Elle sert à retourner le nom de l'équipement ainsi 
@@ -298,15 +298,26 @@ def fonction0x05(port_serial, adresse_appareil) :
     Réglage de la fréquence de rafraichissement ? ou bien de la sensibilité du capteur
     '''
     fonction = "05"
-    nom_appareil = None
+    nom_appareil = "Nan"
+    version_appareil = 0
+    appareil_existe = False
 
     dictionnaire_nom_hexa: dict[str,str] = {"SP1": "02", "D3": "02", "MR4/dp": "0x23", "D4": "0x2E", "DX2-VMS": "0x3B", "DX4-VMS": "0x3D", "DXCA": "0x44", "SP2": "0x1D", "DX3": "0x1E", "DX2": "0x2D", "SP3": "0x2B", "DX3-VMS": "0x3C", "DX-VMS-F": "0x3E", "GS24x8RGB": "0x3F"}
     if len(adresse_appareil) == 4 :
-        bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16))[2:]
-        trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
+        somme = int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16)
+        if somme < 255 :
+            bcc = format(somme, "02X")
+        elif somme < 65025 :
+            bcc = format(somme, "04X")
+        else  :
+            bcc = format(somme, "06X")
+
+        trame = bytes.fromhex(adresse_appareil + fonction + bcc)
         reponse_appareil = port_serial.read(5).hex()
+
         if reponse_appareil == "" :
             raise NameError("L'appareil n'a pas répondu :( vérifier votre installation ou l'adresse donnée !")   
+        
         modele_appareil_hexa = reponse_appareil[4:6]   
         for cle, valeur in dictionnaire_nom_hexa.items() :
             if modele_appareil_hexa == valeur:
@@ -316,13 +327,25 @@ def fonction0x05(port_serial, adresse_appareil) :
         # Détection de la version de l'objet
         version_appareil = reponse_appareil[6:8]
         version_appareil = int(version_appareil, 16)/10                                            # 0x1A = 10 (decimal) = version 1.0
-        return nom_appareil, version_appareil, True
+        return nom_appareil, version_appareil, appareil_existe
             
     elif len(adresse_appareil) == 2 :
-        bcc = hex(int(adresse_appareil, 16) + int(fonction, 16))[2:]
+
+        somme = int(adresse_appareil, 16) + int(fonction, 16)
+        if somme < 255 :
+            bcc = format(somme, "02X")
+        elif somme < 65025 :
+            bcc = format(somme, "04X")
+        else  :
+            bcc = format(somme, "06X")
+            
         trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
         port_serial.write(trame)
         reponse_appareil = port_serial.read(4).hex()
+
+        if reponse_appareil == "" :
+            raise NameError("L'appareil n'a pas répondu :( vérifier votre installation ou l'adresse donnée !")   
+        
         modele_appareil_hexa = reponse_appareil[2:4]
         for cle, valeur in dictionnaire_nom_hexa.items() :
             if modele_appareil_hexa == valeur:
@@ -332,7 +355,9 @@ def fonction0x05(port_serial, adresse_appareil) :
         # Détection de la version de l'objet
         version_appareil = reponse_appareil[6:8]
         version_appareil = int(version_appareil, 16)/10
-        return nom_appareil, version_appareil, True
+        return nom_appareil, version_appareil, appareil_existe
+    else : 
+        return nom_appareil, version_appareil, appareil_existe
 
 # Retourne la distance de détection maximal du capteur
 def fonction0x06(port_serial, adresse_appareil) :
