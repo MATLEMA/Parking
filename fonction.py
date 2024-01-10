@@ -376,17 +376,13 @@ def fonction0x06(port_serial, adresse_appareil) :
     reponse_port = port_serial.read(4).hex()
 
     i = int(reponse_port[4:6], 16)
-    limite_inferieur = 70 + i * 10
     limite_superieur = 80 + i * 10 - 1
     if limite_superieur < 400 and reponse_port[4:6] != "15" and reponse_port[4:6] != "16" :
-        print(f"La distance de détection est entre {limite_inferieur} et {limite_superieur} cm")
         return limite_superieur
 
     elif reponse_port[4:6] == "15" :
-        print(f"La distance de détection est entre 380 et 399 cm")
         return 380
     else : 
-        print(f"La distance de détection est au dessus de 400 cm")
         return 400
 
 # Retourne le mode de détection du capteur
@@ -396,7 +392,7 @@ def fonction0x07(port_serial, adresse_appareil) :
     Elle sert à retourner le mode de détection du capteur
     La trame envoye 4 octets
     La trame reçu est de 4 octets
-    La fonction retourne si oui ou non le capteur prend en compte la détectoin du sol  ?
+    La fonction retourne si oui ou non le capteur prend en compte la détection du sol  ?
     '''
     fonction = "07"
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16))[2:]
@@ -503,6 +499,7 @@ def fonction0x12(port_serial, adresse_appareil, mode : bool) :
     True
     '''
     fonction = "12"
+
     if mode == True : 
         mode_detection : str = "00"
     else : 
@@ -529,7 +526,7 @@ def fonction0x13(port_serial, adresse_appareil, mode : bool) :
         # En mode reception
         mode_reception_transmission : str = "00"
     else : 
-        # En mode recpetion/transmission
+        # En mode reception/transmission
         mode_reception_transmission : str = "FF"
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16) + int(mode_reception_transmission, 16))[2:]
     trame = bytes.fromhex(adresse_appareil + fonction + mode_reception_transmission + bcc)
@@ -553,7 +550,7 @@ def fonction0x14(port_serial, adresse_appareil, valeur) :
     port_serial.write(trame)
     reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
 
-# Force le capteur à clignoter lorsque le siège est libre
+# Force le capteur à clignoter lorsque le place est libre
 def fonction0x15(port_serial, adresse_appareil, temps) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial, de l'adresse de l'appareil ainsi qu'une valeur de temps(en ms) mutliple de 100ms et ne doit pas dépasser 
@@ -591,7 +588,6 @@ def fonction0x1B(port_serial, adresse_appareil) :
     fonction = "1B"
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16))[2:] 
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
-    print(str(adresse_appareil + fonction + bcc))
     port_serial.write(trame)
     
     reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
