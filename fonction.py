@@ -289,7 +289,7 @@ def fonction0x04(port_serial, adresse_appareil) :
     return valeur
 
 # Recherche les informations d'un équipement (Nom de l'équipement | version)
-def fonction0x05(port_serial, adresse_appareil: str) :
+def fonction0x05(port_serial, adresse_appareil: str) -> tuple[str, float, bool]:
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial ainsi que l'adresse_appareil
     Elle sert à retourner le nom de l'équipement ainsi 
@@ -358,7 +358,7 @@ def fonction0x05(port_serial, adresse_appareil: str) :
         version_appareil = int(version_appareil, 16)/10
         return nom_appareil, version_appareil, appareil_existe
     else : 
-        return nom_appareil, version_appareil, appareil_existe
+        raise ValueError
 
 # Retourne la distance de détection maximal du capteur
 def fonction0x06(port_serial, adresse_appareil) :
@@ -536,7 +536,7 @@ def fonction0x13(port_serial, adresse_appareil, mode : bool) :
     port_serial.write(trame)
     reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
 
-# Modifie la valeur du potenctiomètre digital
+# Modifie la valeur du potentiomètre digital
 def fonction0x14(port_serial, adresse_appareil, valeur) :
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial, de l'adresse de l'appareil ainsi qu'une valeur comprise entre 1 et 64
