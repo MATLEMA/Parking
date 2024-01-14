@@ -25,6 +25,54 @@ def redefinir_fenetre(parent, longeur_fenetre : int, hauteur_fenetre: int) :
 
     parent.geometry(f"{longeur_fenetre}x{hauteur_fenetre}")
 
+class Configuration_SP3(Tk):
+
+    def __init__(self, parent, liste_des_objets, listbox : Listbox ):
+
+        port_objet = listbox.selection_get()
+
+        self.parent = parent
+        self.fenetre_config_SP3 = LabelFrame(parent, text= "Configuration du SP3")
+        self.fenetre_config_SP3.pack()
+
+        # Port
+        label_port_com = Label(self.fenetre_config_SP3, text= "Port COM de l'objet :")
+        label_port_com.grid()
+
+        afficher_port_com = Entry(self.fenetre_config_SP3)
+        afficher_port_com.insert(0, liste_des_objets[port_objet][1])
+        afficher_port_com.grid(padx= 10)
+        afficher_port_com["state"] = "disabled"
+
+        # Modele
+        label_modele_objet = Label(self.fenetre_config_SP3, text= "Modele de l'objet :")
+        label_modele_objet.grid()
+
+        afficher_modele_objet = Entry(self.fenetre_config_SP3)
+        afficher_modele_objet.insert(0, liste_des_objets[port_objet][0])
+        afficher_modele_objet.grid()
+        afficher_modele_objet["state"] = "disabled"
+
+        # Version
+        label_version_objet = Label(self.fenetre_config_SP3, text= "Version logiciel de l'objet :")
+        label_version_objet.grid()
+
+        afficher_version_objet = Entry(self.fenetre_config_SP3)
+        afficher_version_objet.insert(0, liste_des_objets[port_objet][2])
+        afficher_version_objet.grid()
+        afficher_version_objet["state"] = "disabled"
+
+        # Adresse
+        label_adresse_objet = Label(self.fenetre_config_SP3, text= "Adresse de l'objet :")
+        label_adresse_objet.grid()
+
+        afficher_adresse_objet = Entry(self.fenetre_config_SP3)
+        afficher_adresse_objet.insert(0, port_objet)
+        afficher_adresse_objet.grid()
+        afficher_adresse_objet["state"] = "disabled"
+
+    def ajout_fonction0x01(self):
+        pass
 
 class Configuration(Tk) :
 
@@ -82,58 +130,12 @@ class Configuration(Tk) :
 
         self.variable_pour_liste.set(list(self.liste_des_objets.keys()))
 
-    def changement_de_port(self) :
-
-        self.liste_des_objets.clear
-
-    def objet_selectionner(self, evenement) :
-
-        port_objet = self.liste.selection_get()
-        self.nettoyer_widgets()
-    
+    def objet_selectionner(self, event) :
+        
         redefinir_fenetre(self.parent, 795, 400)
 
-        # Port
-        label_port_com = Label(self.configuration_objet, text= "Port COM de l'objet :")
-        label_port_com.grid()
-
-        afficher_port_com = Entry(self.configuration_objet)
-        afficher_port_com.insert(0, self.liste_des_objets[port_objet][1])
-        afficher_port_com.grid(padx= 10)
-        afficher_port_com["state"] = "disabled"
-
-        # Modele
-        label_modele_objet = Label(self.configuration_objet, text= "Modele de l'objet :")
-        label_modele_objet.grid()
-
-        afficher_modele_objet = Entry(self.configuration_objet)
-        afficher_modele_objet.insert(0, self.liste_des_objets[port_objet][0])
-        afficher_modele_objet.grid()
-        afficher_modele_objet["state"] = "disabled"
-
-        # Version
-        label_version_objet = Label(self.configuration_objet, text= "Version logiciel de l'objet :")
-        label_version_objet.grid()
-
-        afficher_version_objet = Entry(self.configuration_objet)
-        afficher_version_objet.insert(0, self.liste_des_objets[port_objet][2])
-        afficher_version_objet.grid()
-        afficher_version_objet["state"] = "disabled"
-
-        # Adresse
-        label_adresse_objet = Label(self.configuration_objet, text= "Adresse de l'objet :")
-        label_adresse_objet.grid()
-
-        afficher_adresse_objet = Entry(self.configuration_objet)
-        afficher_adresse_objet.insert(0, port_objet)
-        afficher_adresse_objet.grid()
-        afficher_adresse_objet["state"] = "disabled"
-
-    def nettoyer_widgets(self) :
-
-        for enfant in self.configuration_objet.winfo_children():
-            enfant.destroy()
-
+        existe = Configuration_SP3(self.parent, self.liste_des_objets, self.liste)
+        
     def nouveau_port(self) : 
 
         self.configuration.destroy()
@@ -162,7 +164,6 @@ class Configuration(Tk) :
 
                 except NameError:
                     messagebox.showerror(title= "Erreur", message= "L'appareil n'a pas répondu !")
-        
 
 class Connexion(Tk) :
     

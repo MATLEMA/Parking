@@ -57,7 +57,6 @@ def envoi_trame(port_serial: Serial, adresse_appareil : str, nom_fonction: str, 
             retry -= 1
     raise TimeoutError("L'appareil n'a pas répondu")
 
-
 class Appareil:
         def __init__(self , adresse: str, port_serial, modele : str ,version: float) :
             self.port_serial = port_serial
