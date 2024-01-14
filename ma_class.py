@@ -7,16 +7,21 @@ def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "") -> str :
         int(adresse_appareil, 16)
     except ValueError :
         raise ValueError("adresse_appareil en hexadecimal!")
-    if len(adresse_appareil) != 2 or len(adresse_appareil) != 4 :
+    print(len(adresse_appareil))
+    if len(adresse_appareil) not in [2, 4] :
          raise ValueError("adresse_appareil doit être de longeur 2 ou 4!") 
          
     
     # Si l'adresse est de 2 octet
     if len(adresse_appareil) == 4 :
-        somme = int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(nom_fonction, 16) + int(valeur, 16)
-        if somme < 255 :
+        if valeur == "" :
+            somme = int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(nom_fonction, 16) 
+        else : 
+            somme = int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(nom_fonction, 16) + int(valeur, 16)
+
+        if somme <= 255 :
             bcc = format(somme, "02X")
-        elif somme < 65025 :
+        elif somme <= 65535 :
             bcc = format(somme, "04X")
         else  :
             bcc = format(somme, "06X")
@@ -25,10 +30,13 @@ def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "") -> str :
     # Si l'adresse est 1 octet
     elif len(adresse_appareil) == 2 :
 
-        somme = int(adresse_appareil, 16) + int(nom_fonction, 16) + int(valeur, 16)
-        if somme < 255 :
+        if valeur == "" :
+            somme = int(adresse_appareil, 16) + int(nom_fonction, 16)
+        else : 
+            somme = int(adresse_appareil, 16) + int(nom_fonction, 16) + int(valeur, 16)
+        if somme <= 255 :
             bcc = format(somme, "02X")
-        elif somme < 65025 :
+        elif somme <= 65535 :
             bcc = format(somme, "04X")
         else  :
             bcc = format(somme, "06X")
@@ -40,7 +48,7 @@ def envoi_trame(port_serial: Serial, adresse_appareil : str, nom_fonction: str, 
     
     while retry > 0 :
         # Fabrication de la trame à envoyée
-        trame_envoyee = bytes.fromhex(adresse_appareil + nom_fonction + valeur + bcc )
+        trame_envoyee: bytes = bytes.fromhex(adresse_appareil + nom_fonction + valeur + bcc )
 
         # Envoie de la trame 
         port_serial.write(trame_envoyee)
@@ -58,7 +66,7 @@ def envoi_trame(port_serial: Serial, adresse_appareil : str, nom_fonction: str, 
     raise TimeoutError("L'appareil n'a pas répondu")
 
 class Appareil:
-        def __init__(self , adresse: str, port_serial, modele : str ,version: float) :
+        def __init__(self , adresse: str, port_serial : Serial, modele : str ,version: float) :
             self.port_serial = port_serial
             self.modele = modele
             self.version = version
@@ -66,7 +74,7 @@ class Appareil:
 
 class SP3(Appareil):
 
-        def __init__(self , adresse: str, port_serial, modele : str ,version: float):
+        def __init__(self , adresse: str, port_serial : Serial, modele : str ,version: float):
             super().__init__(adresse, port_serial, modele, version)
         
         # Nombre d'envoie de la trame, avant echec

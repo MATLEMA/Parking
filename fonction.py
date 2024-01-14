@@ -18,7 +18,7 @@ def connecter(port, baudrate, timeout):
     timeout = float(timeout)
 
     try :
-        port_serial = serial.Serial(port, baudrate, timeout= timeout)
+        serial.Serial(port, baudrate, timeout= timeout)
         return True
     except serial.SerialException :
         return False
@@ -31,7 +31,7 @@ if __name__ == "__main__" :
     print(f"Nom   Description\n")          
 
     # Boucle qui passe par tout les paramètres de la class ListPortInfo de notre variable listing_des_ports
-    for information_port_disponible in (listing_des_ports) :
+    for information_port_disponible in listing_des_ports :
         print(f"{information_port_disponible.device} | {information_port_disponible.description} | {information_port_disponible.interface}\n")
 
 # Liste les port sur la machine
@@ -89,7 +89,7 @@ def test_port_ouvert() :
     return port, baudrate, timeout, port_serial
 
 # Détection automatique de tous les appareils connectés en réseau serie
-def detection_appareil(port_serial, stop) -> dict[str, str]:
+def detection_appareil(port_serial, stop : threading.Event) -> dict[str, str]:
     '''
     Ceci est une fonction permettant de détecter tout les appareils sur le réseau serie
     Elle sortira un dictionnaire de type dict[str, str] = {"SP3": "4F"}\n
@@ -108,20 +108,20 @@ def detection_appareil(port_serial, stop) -> dict[str, str]:
     modele_appareil = None
     reponse_appareil = ""
 
-    if stop == True : 
-        return dictionnaire_appareils
+
     for i in range(0,256) :
         
-        if stop == True : 
+        # Permet d'interrompre le script si le flag est True
+        if stop.is_set() : 
             return dictionnaire_appareils
-
+        
         # Variables
         test_ping_2_formate = format(i, '02X')
 
         somme = int(test_ping_2_formate, 16) + int(fonction, 16)
-        if somme < 255 :
+        if somme <= 255 :
             bcc = format(somme, "02X")
-        elif somme < 65025 :
+        elif somme <= 65535 :
             bcc = format(somme, "04X")
         else  :
             bcc = format(somme, "06X")
@@ -153,16 +153,18 @@ def detection_appareil(port_serial, stop) -> dict[str, str]:
             test_ping_4_formate = test_ping_2_formate + test_ping_4
 
             somme = int(test_ping_4_formate[0:2], 16) + int(test_ping_4_formate[2:4], 16) + int(fonction, 16)
-            if somme < 255 :
+
+            # Il ce peut que les équipements soit codée de facons à ne jamais avoir une adresse qui pourrait renvoyer un bcc de plus de 1 octet?
+            if somme <= 255 :
                 bcc = format(somme, "02X")
-            elif somme < 65025 :
+            elif somme <= 65535 :
                 bcc = format(somme, "04X")
             else  :
                 bcc = format(somme, "06X")
             print(test_ping_4_formate+fonction+bcc)
             trame = bytes.fromhex(test_ping_4_formate + fonction + bcc)
             port_serial.write(trame)
-                
+                        
             if port_serial.in_waiting > 0:
                 reponse_appareil = port_serial.read(port_serial.in_waiting)
 
@@ -180,9 +182,6 @@ def detection_appareil(port_serial, stop) -> dict[str, str]:
 
                         dictionnaire_appareils[f"Object_{nombre_objet+1}"] = Appareil(test_ping_4, port_serial, modele_appareil, version_appareil)
                         break
-                    
-    print(nombre_objet*900)
-
     return dictionnaire_appareils
 
 ############################################################################################################################################################################

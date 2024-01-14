@@ -27,20 +27,23 @@ def redefinir_fenetre(parent, longeur_fenetre : int, hauteur_fenetre: int) :
 
 class Configuration_SP3(Tk):
 
-    def __init__(self, parent, liste_des_objets, listbox : Listbox ):
+    def __init__(self, parent, dict_des_objets : dict[str,list[str]], liste_des_instances_appareil : list[Appareil], listbox : Listbox ):
 
-        port_objet = listbox.selection_get()
+        self.listbox: Listbox = listbox
+        self.dict_des_objets: dict[str, list[str]] = dict_des_objets
+        self.liste_des_instances_appareil: list[Appareil | SP3 | DX3] = liste_des_instances_appareil
+        port_objet: str = self.listbox.selection_get()
 
         self.parent = parent
         self.fenetre_config_SP3 = LabelFrame(parent, text= "Configuration du SP3")
-        self.fenetre_config_SP3.pack()
+        self.fenetre_config_SP3.pack(side="left",anchor= "n")
 
         # Port
         label_port_com = Label(self.fenetre_config_SP3, text= "Port COM de l'objet :")
         label_port_com.grid()
 
         afficher_port_com = Entry(self.fenetre_config_SP3)
-        afficher_port_com.insert(0, liste_des_objets[port_objet][1])
+        afficher_port_com.insert(0, dict_des_objets[port_objet][1])
         afficher_port_com.grid(padx= 10)
         afficher_port_com["state"] = "disabled"
 
@@ -49,7 +52,7 @@ class Configuration_SP3(Tk):
         label_modele_objet.grid()
 
         afficher_modele_objet = Entry(self.fenetre_config_SP3)
-        afficher_modele_objet.insert(0, liste_des_objets[port_objet][0])
+        afficher_modele_objet.insert(0, dict_des_objets[port_objet][0])
         afficher_modele_objet.grid()
         afficher_modele_objet["state"] = "disabled"
 
@@ -58,7 +61,7 @@ class Configuration_SP3(Tk):
         label_version_objet.grid()
 
         afficher_version_objet = Entry(self.fenetre_config_SP3)
-        afficher_version_objet.insert(0, liste_des_objets[port_objet][2])
+        afficher_version_objet.insert(0, dict_des_objets[port_objet][2])
         afficher_version_objet.grid()
         afficher_version_objet["state"] = "disabled"
 
@@ -71,16 +74,31 @@ class Configuration_SP3(Tk):
         afficher_adresse_objet.grid()
         afficher_adresse_objet["state"] = "disabled"
 
+        # Bouton fonction 01
+        mode_test = Button(self.fenetre_config_SP3, text="Activer Mode Test", command=self.ajout_fonction0x01)
+        mode_test.grid(column= 1, row= 0, padx= 5, pady= 5)
+
+    def nouveau_port(self) : 
+
+            self.fenetre_config_SP3.destroy()
+
     def ajout_fonction0x01(self):
-        pass
+
+        index: int = self.listbox.curselection()[0]
+        appareil: SP3 = self.liste_des_instances_appareil[index]        # ?
+        appareil.mode_test()
 
 class Configuration(Tk) :
 
-    liste_des_objets : dict[str,list[str]] = {}
+    dict_des_objets : dict[str,list[str]] = {}
+    liste_des_instances_appareil: list[Appareil] = []
 
-    def __init__(self,parent) :
+    def __init__(self,parent, port : Serial) :
 
+        self.existe = None
+        self.port_actuelle = port
         self.parent = parent
+
         self.configuration = LabelFrame(parent, text= "Configuration")
         self.configuration.pack(side="left", expand=False, fill= "y",anchor= "n", ipady= 50, ipadx= 50)
 
@@ -89,9 +107,9 @@ class Configuration(Tk) :
         self.liste.pack(side="top", expand=True, fill= "both")
 
 
-        self.ajout_liste(self.ajout_de_methode_objet(Appareil("4F31", "COM1", "SP3", 1.0)))
+        self.ajout_liste(self.ajout_de_methode_objet(Appareil("4F31", self.port_actuelle, "SP3", 1.0)))
 
-        self.ajout_liste(self.ajout_de_methode_objet(Appareil("4F32", "COM1", "SP3", 1.0)))
+        self.ajout_liste(self.ajout_de_methode_objet(Appareil("4F32", self.port_actuelle, "SP3", 1.0)))
 
         self.liste.bind("<<ListboxSelect>>", self.objet_selectionner)
 
@@ -123,19 +141,23 @@ class Configuration(Tk) :
             
     def ajout_liste(self, objet : Appareil) :
         
-        self.liste_des_objets[objet.adresse] = [objet.modele, objet.port_serial, str(objet.version)]
+        self.dict_des_objets[objet.adresse] = [objet.modele, objet.port_serial.port, str(objet.version)]
+        self.liste_des_instances_appareil.append(objet)
         self.maj_listbox()
 
     def maj_listbox(self):
 
-        self.variable_pour_liste.set(list(self.liste_des_objets.keys()))
+        self.variable_pour_liste.set(list(self.dict_des_objets.keys()))
 
     def objet_selectionner(self, event) :
         
         redefinir_fenetre(self.parent, 795, 400)
 
-        existe = Configuration_SP3(self.parent, self.liste_des_objets, self.liste)
-        
+        if self.existe:
+             self.existe.nouveau_port()
+
+        self.existe = Configuration_SP3(self.parent, self.dict_des_objets, self.liste_des_instances_appareil, self.liste)
+
     def nouveau_port(self) : 
 
         self.configuration.destroy()
@@ -159,8 +181,8 @@ class Configuration(Tk) :
 
             if is_valid == True :
                 try :
-                    nom_appareil, version_appareil, _ = fonction0x05(port_actuelle, str(adresse))
-                    self.ajout_liste(objet= Appareil(adresse, port, nom_appareil, version_appareil))
+                    nom_appareil, version_appareil, _ = fonction0x05(self.port_actuelle, str(adresse))
+                    self.ajout_liste(objet= Appareil(adresse, self.port_actuelle, nom_appareil, version_appareil))
 
                 except NameError:
                     messagebox.showerror(title= "Erreur", message= "L'appareil n'a pas répondu !")
@@ -194,20 +216,18 @@ class Connexion(Tk) :
 
     def script_bouton_connexion(self) :
 
-        global port
         port = self.combobox_port.get()
         baudrate = self.combobox_baudrate.get()
         timeout = self.combobox_timeout.get()
 
         if connecter(port, baudrate, timeout) == True :
             
-            global port_actuelle
-            port_actuelle = Serial(port, int(baudrate), timeout= float(timeout), write_timeout= 0)
+            self.port_actuelle = Serial(port, int(baudrate), timeout= float(timeout), write_timeout= 0)
 
             # Lancement du Thread pour la détection automatique des appareils
 
-            self.stop_thread = True
-            self.detection_automatique_appareils = threading.Thread(target=detection_appareil, args=(port_actuelle, lambda: self.stop_thread), daemon= True)
+            self.stop_thread = threading.Event()
+            self.detection_automatique_appareils = threading.Thread(target=detection_appareil, args=(self.port_actuelle, self.stop_thread), daemon= True)
             self.detection_automatique_appareils.start()
 
             self.combobox_port["state"] = "disabled"
@@ -216,7 +236,7 @@ class Connexion(Tk) :
 
             redefinir_fenetre(self.parent, 395, 400)
 
-            self.application_configuration = Configuration(self.parent)
+            self.application_configuration = Configuration(self.parent, self.port_actuelle)
 
             self.deconnexion_bouton()
         else : 
@@ -230,7 +250,9 @@ class Connexion(Tk) :
     
     def script_bouton_deconnexion(self) :
 
-        self.stop_thread = True
+        self.stop_thread.set()
+        self.detection_automatique_appareils.join()
+        self.port_actuelle.close()
         self.combobox_port["state"] = "enabled"
         self.combobox_baudrate["state"] = "enabled"
         self.combobox_timeout["state"] = "enabled"
@@ -240,12 +262,12 @@ class Connexion(Tk) :
 
         redefinir_fenetre(self.parent, largeur, longeur)
 
-        if hasattr(self, "application_configuration"):
-            self.application_configuration.nouveau_port()
+        self.application_configuration.nouveau_port()
         
 
 class Main :
     def __init__(self) :
+
         root = Tk()
 
         centrer_fenetre(root, largeur, longeur)
@@ -257,6 +279,3 @@ class Main :
         self.application_connexion = Connexion(root)
 
         root.mainloop()
-
-    # @property  # Setter
-    # @house.setter # getter
