@@ -1,7 +1,7 @@
 from tkinter import ttk,messagebox, Tk, Listbox, LabelFrame, Variable, Button, Entry, Label
 from fonction import listing_port, connecter, detection_appareil, fonction0x05
-import serial
-from ma_class import Appareil
+from serial import Serial
+from ma_class import Appareil, SP3, DX3
 import threading
 
 
@@ -40,9 +40,10 @@ class Configuration(Tk) :
         self.liste = Listbox(self.configuration, listvariable= self.variable_pour_liste)
         self.liste.pack(side="top", expand=True, fill= "both")
 
-        self.ajout_liste(Appareil("COM1", "SP3", 1.0, "4F31"))
 
-        self.ajout_liste(Appareil("COM1", "SP4", 1.0, "4F32"))
+        self.ajout_liste(self.ajout_de_methode_objet(Appareil("4F31", "COM1", "SP3", 1.0)))
+
+        self.ajout_liste(self.ajout_de_methode_objet(Appareil("4F32", "COM1", "SP3", 1.0)))
 
         self.liste.bind("<<ListboxSelect>>", self.objet_selectionner)
 
@@ -60,7 +61,18 @@ class Configuration(Tk) :
         self.bouton_test_adresse_manuel = Button(self.configuration, text="Ajouter", command= self.ajout_manuel_objet)
         self.bouton_test_adresse_manuel.pack(side= "top", pady= 5)
         
+    def ajout_de_methode_objet(self, appareil : Appareil)  -> SP3 | DX3 | Appareil:
 
+        if appareil.modele == "SP3" :
+            appareil = SP3(appareil.adresse, appareil.port_serial, appareil.modele, appareil.version)
+            return appareil
+        
+        if appareil.modele == "DX3" :
+            appareil = DX3(appareil.adresse, appareil.port_serial, appareil.modele, appareil.version)
+            return appareil
+        else : return appareil
+        
+            
     def ajout_liste(self, objet : Appareil) :
         
         self.liste_des_objets[objet.adresse] = [objet.modele, objet.port_serial, str(objet.version)]
@@ -146,7 +158,7 @@ class Configuration(Tk) :
             if is_valid == True :
                 try :
                     nom_appareil, version_appareil, _ = fonction0x05(port_actuelle, str(adresse))
-                    self.ajout_liste(objet= Appareil(port, nom_appareil, version_appareil, adresse))
+                    self.ajout_liste(objet= Appareil(adresse, port, nom_appareil, version_appareil))
 
                 except NameError:
                     messagebox.showerror(title= "Erreur", message= "L'appareil n'a pas répondu !")
@@ -189,7 +201,7 @@ class Connexion(Tk) :
         if connecter(port, baudrate, timeout) == True :
             
             global port_actuelle
-            port_actuelle = serial.Serial(port, int(baudrate), timeout= float(timeout), write_timeout= 0)
+            port_actuelle = Serial(port, int(baudrate), timeout= float(timeout), write_timeout= 0)
 
             # Lancement du Thread pour la détection automatique des appareils
 

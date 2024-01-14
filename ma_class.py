@@ -59,19 +59,19 @@ def envoi_trame(port_serial: Serial, adresse_appareil : str, nom_fonction: str, 
 
 
 class Appareil:
-        def __init__(self ,port_serial : Serial , modele : str ,version: float, adresse: str) :
+        def __init__(self , adresse: str, port_serial, modele : str ,version: float) :
             self.port_serial = port_serial
             self.modele = modele
             self.version = version
             self.adresse = adresse
 
 class SP3(Appareil):
-        
-        def __init__(self, port_serial, version: float, adresse: str):
-            super().__init__(port_serial, "SP3", version, adresse)
 
-            # Nombre d'envoie de la trame, avant echec
-            self.retry = 5
+        def __init__(self , adresse: str, port_serial, modele : str ,version: float):
+            super().__init__(adresse, port_serial, modele, version)
+        
+        # Nombre d'envoie de la trame, avant echec
+        retry = 5
         
         # Fonction 0x01 | Active ou désactive le mode test du capteur SP3
         def mode_test(self)  -> None:
@@ -324,5 +324,6 @@ class SP3(Appareil):
             envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry, valeur="64")
 
 class DX3(Appareil) :
-        def __init__(self, port_serial: Serial, version: float, adresse: str):
-            super().__init__(port_serial, "DX3", version, adresse)
+        
+        def hello(self):
+            pass

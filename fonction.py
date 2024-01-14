@@ -145,7 +145,7 @@ def detection_appareil(port_serial, stop) -> dict[str, str]:
                     # 0x1A = 10 (decimal) = version 1.0
                     version_appareil = int(version_appareil, 16)/10
 
-                    dictionnaire_appareils[f"Object_{nombre_objet+1}"] = Appareil(port_serial, modele_appareil, version_appareil, test_ping_2_formate)
+                    dictionnaire_appareils[f"Object_{nombre_objet+1}"] = Appareil(test_ping_2_formate, port_serial, modele_appareil, version_appareil)
                     break
 
         for x in range(0,256):
@@ -178,7 +178,7 @@ def detection_appareil(port_serial, stop) -> dict[str, str]:
                         # 0x1A = 10 (decimal) = version 1.0
                         version_appareil = int(version_appareil, 16)/10
 
-                        dictionnaire_appareils[f"Object_{nombre_objet+1}"] = Appareil(port_serial, modele_appareil, version_appareil, test_ping_4)
+                        dictionnaire_appareils[f"Object_{nombre_objet+1}"] = Appareil(test_ping_4, port_serial, modele_appareil, version_appareil)
                         break
                     
     print(nombre_objet*900)
