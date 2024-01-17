@@ -1,7 +1,7 @@
 import serial
 import serial.tools.list_ports
 import threading
-from ma_class import Appareil
+from .ma_class import Appareil
 from time import sleep
 
 
@@ -119,19 +119,14 @@ def detection_appareil(port_serial, stop : threading.Event) -> dict[str, str]:
         test_ping_2_formate = format(i, '02X')
 
         somme = int(test_ping_2_formate, 16) + int(fonction, 16)
-        if somme <= 255 :
-            bcc = format(somme, "02X")
-        elif somme <= 65535 :
-            bcc = format(somme, "04X")
-        else  :
-            bcc = format(somme, "06X")
+
+        bcc = format(int(str(somme)[0:2]), "02X")
 
         print(test_ping_2_formate+fonction+bcc)
         trame = bytes.fromhex(str(test_ping_2_formate + fonction + bcc))
         port_serial.write(trame)
 
-        if port_serial.in_waiting > 0:
-            reponse_appareil = port_serial.read(port_serial.in_waiting)
+        reponse_appareil = port_serial.read(4)
 
         if reponse_appareil != "" :
             reponse_modele_appareil = reponse_appareil[2:4]
@@ -155,18 +150,15 @@ def detection_appareil(port_serial, stop : threading.Event) -> dict[str, str]:
             somme = int(test_ping_4_formate[0:2], 16) + int(test_ping_4_formate[2:4], 16) + int(fonction, 16)
 
             # Il ce peut que les équipements soit codée de facons à ne jamais avoir une adresse qui pourrait renvoyer un bcc de plus de 1 octet?
-            if somme <= 255 :
-                bcc = format(somme, "02X")
-            elif somme <= 65535 :
-                bcc = format(somme, "04X")
-            else  :
-                bcc = format(somme, "06X")
+
+            bcc = format(int(str(somme)[0:2]), "02X")
+
             print(test_ping_4_formate+fonction+bcc)
             trame = bytes.fromhex(test_ping_4_formate + fonction + bcc)
             port_serial.write(trame)
                         
-            if port_serial.in_waiting > 0:
-                reponse_appareil = port_serial.read(port_serial.in_waiting)
+            
+            reponse_appareil = port_serial.read(5)
 
             if reponse_appareil != "" :
                 reponse_modele_appareil = reponse_appareil[4:6]
@@ -237,7 +229,7 @@ def fonction0x02(port_serial, adresse_appareil) :
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16)+ int(fonction, 16))[2:] 
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
     port_serial.write(trame)
-    reponse_appareil = port_serial.read(2).hex()
+    reponse_appareil = port_serial.read(1).hex()
     if reponse_appareil == "" :
         raise NameError("L'appareil n'a pas répondu :( vérifier votre installation ou l'adresse donnée !")
 
@@ -256,7 +248,7 @@ def fonction0x03(port_serial, adresse_appareil) :
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16)+ int(fonction, 16))[2:]
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
     port_serial.write(trame)
-    reponse_appareil = port_serial.read(4).hex()
+    reponse_appareil = port_serial.read(2).hex()
     if reponse_appareil == "" :
         raise NameError("L'appareil n'a pas répondu :( vérifier votre installation ou l'adresse donnée !")
     if reponse_appareil[4:6] == "00" :
@@ -281,7 +273,7 @@ def fonction0x04(port_serial, adresse_appareil) :
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16)+ int(fonction, 16))[2:]
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
     port_serial.write(trame)
-    reponse_appareil = port_serial.read(4).hex()
+    reponse_appareil = port_serial.read(2).hex()
     if reponse_appareil == "" :
         raise NameError("L'appareil n'a pas répondu :( vérifier votre installation ou l'adresse donnée !")
     valeur = int(reponse_appareil[4:6], 16)
@@ -305,15 +297,11 @@ def fonction0x05(port_serial, adresse_appareil: str) -> tuple[str, float, bool]:
     dictionnaire_nom_hexa: dict[str,str] = {"SP1": "02", "D3": "02", "MR4/dp": "0x23", "D4": "0x2E", "DX2-VMS": "0x3B", "DX4-VMS": "0x3D", "DXCA": "0x44", "SP2": "0x1D", "DX3": "0x1E", "DX2": "0x2D", "SP3": "0x2B", "DX3-VMS": "0x3C", "DX-VMS-F": "0x3E", "GS24x8RGB": "0x3F"}
     if len(adresse_appareil) == 4 :
         somme = int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16)
-        if somme < 255 :
-            bcc = format(somme, "02X")
-        elif somme < 65025 :
-            bcc = format(somme, "04X")
-        else  :
-            bcc = format(somme, "06X")
+        
+        bcc = format(int(str(somme)[0:2]), "02X")
 
         trame = bytes.fromhex(adresse_appareil + fonction + bcc)
-        reponse_appareil = port_serial.read(5).hex()
+        reponse_appareil = port_serial.read(2).hex()
 
         if reponse_appareil == "" :
             raise NameError("L'appareil n'a pas répondu :( vérifier votre installation ou l'adresse donnée !")   
@@ -332,16 +320,12 @@ def fonction0x05(port_serial, adresse_appareil: str) -> tuple[str, float, bool]:
     elif len(adresse_appareil) == 2 :
 
         somme = int(adresse_appareil, 16) + int(fonction, 16)
-        if somme < 255 :
-            bcc = format(somme, "02X")
-        elif somme < 65025 :
-            bcc = format(somme, "04X")
-        else  :
-            bcc = format(somme, "06X")
+
+        bcc = format(int(str(somme)[0:2]), "02X")
             
         trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
         port_serial.write(trame)
-        reponse_appareil = port_serial.read(4).hex()
+        reponse_appareil = port_serial.read(2).hex()
 
         if reponse_appareil == "" :
             raise NameError("L'appareil n'a pas répondu :( vérifier votre installation ou l'adresse donnée !")   
@@ -397,7 +381,7 @@ def fonction0x07(port_serial, adresse_appareil) :
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16))[2:]
     trame = bytes.fromhex(adresse_appareil + fonction + bcc)
     port_serial.write(trame)
-    reponse_port = port_serial.read(4).hex()
+    reponse_port = port_serial.read(2).hex()
     if reponse_port[4:6] == "00" :
         print("L'appareil prendra en compte la détection du sol pour décider de son état")
         return True
@@ -418,7 +402,7 @@ def fonction0x09(port_serial, adresse_appareil) :
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16))[2:]
     trame = bytes.fromhex(adresse_appareil + fonction + bcc)
     port_serial.write(trame)
-    reponse_port = port_serial.read(4).hex()
+    reponse_port = port_serial.read(2).hex()
     reponse_type_binaire= bin(int(reponse_port[4:6],16))[7:]
 
     if reponse_type_binaire[0] == 1 :
@@ -449,7 +433,7 @@ def fonction0x10(port_serial, adresse_appareil) :
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16))[2:] 
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
     port_serial.write(trame)
-    reponse_port = port_serial.read(4).hex()
+    reponse_port = port_serial.read(2).hex()
     if reponse_port == "" :
         raise NameError(f"Le capteur {adresse_appareil} n'est pas connecter ! ou n'a pas répondu !")
     if reponse_port[4:6] == "00":
@@ -479,7 +463,7 @@ def fonction0x11(port_serial, adresse_appareil, distance) :
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16) + int(distance, 16))[2:]
     trame = bytes.fromhex(adresse_appareil + fonction + distance + bcc)
     port_serial.write(trame)
-    reponse_port = port_serial.read(4).hex()
+    reponse_port = port_serial.read(2).hex()
     if reponse_port[4:6] == "00" :
         return True
     else :
@@ -506,7 +490,7 @@ def fonction0x12(port_serial, adresse_appareil, mode : bool) :
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16) + int(mode_detection, 16))[2:]
     trame = bytes.fromhex(adresse_appareil + fonction + mode_detection + bcc)
     port_serial.write(trame)
-    reponse_port = port_serial.read(4).hex()
+    reponse_port = port_serial.read(2).hex()
     if reponse_port[4:6] == "00" :
         return True
     else :
@@ -530,7 +514,7 @@ def fonction0x13(port_serial, adresse_appareil, mode : bool) :
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16) + int(mode_reception_transmission, 16))[2:]
     trame = bytes.fromhex(adresse_appareil + fonction + mode_reception_transmission + bcc)
     port_serial.write(trame)
-    reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
+    reponse_port = port_serial.read(2).hex()       # Voir si cela ne casse pas qq chose quand enlevé
 
 # Modifie la valeur du potentiomètre digital
 def fonction0x14(port_serial, adresse_appareil, valeur) :
@@ -564,7 +548,7 @@ def fonction0x15(port_serial, adresse_appareil, temps) :
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16) + int(temps, 16))[2:]
     trame = bytes.fromhex(adresse_appareil + fonction + temps + bcc)
     port_serial.write(trame)
-    reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
+    reponse_port = port_serial.read(2).hex()       # Voir si cela ne casse pas qq chose quand enlevé
 
 # Force les leds à devenir de couleur verte
 def fonction0x19(port_serial, adresse_appareil) :
@@ -572,7 +556,7 @@ def fonction0x19(port_serial, adresse_appareil) :
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16))[2:] 
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
     port_serial.write(trame)
-    reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
+    reponse_port = port_serial.read(2).hex()       # Voir si cela ne casse pas qq chose quand enlevé
 
 # Force les leds à devenir de couleur rouge
 def fonction0x1A(port_serial, adresse_appareil) :
@@ -580,7 +564,7 @@ def fonction0x1A(port_serial, adresse_appareil) :
     bcc = hex(int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16))[2:] 
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
     port_serial.write(trame)
-    reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
+    reponse_port = port_serial.read(2).hex()       # Voir si cela ne casse pas qq chose quand enlevé
 
 # Force les leds à devenir de couleur orange
 def fonction0x1B(port_serial, adresse_appareil) :
@@ -589,7 +573,7 @@ def fonction0x1B(port_serial, adresse_appareil) :
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
     port_serial.write(trame)
     
-    reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
+    reponse_port = port_serial.read(2).hex()       # Voir si cela ne casse pas qq chose quand enlevé
     return reponse_port
 
 ############################################################################################################################################################################
@@ -618,7 +602,7 @@ def fonction0x40(port_serial, adresse_appareil, nombre) :
     print(str(adresse_appareil + fonction + "04" + hexa_nombre_un + hexa_nombre_deux + hexa_nombre_trois + hexa_nombre_quatre + bcc))
     trame = bytes.fromhex(str(adresse_appareil + fonction + "04" + hexa_nombre_un + hexa_nombre_deux + hexa_nombre_trois + hexa_nombre_quatre + bcc))
     port_serial.write(trame)
-    reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
+    reponse_port = port_serial.read(2).hex()       # Voir si cela ne casse pas qq chose quand enlevé
 
 # Modifie la luminosité des leds 
 def fonction0x41(port_serial, adresse_appareil, valeur) :
@@ -635,7 +619,7 @@ def fonction0x41(port_serial, adresse_appareil, valeur) :
     bcc = hex(int(adresse_appareil, 16) + int(fonction, 16) + int("01",16) + int(luminosité, 16))[2:] 
     trame = bytes.fromhex(str(adresse_appareil + fonction + "01" + luminosité + bcc))
     port_serial.write(trame)
-    reponse_port = port_serial.read(4).hex()       # Voir si cela ne casse pas qq chose quand enlevé
+    reponse_port = port_serial.read(2).hex()       # Voir si cela ne casse pas qq chose quand enlevé
     
 # Affiche la valeur actuelle de la luminosité des leds
 def fonction0x42(port_serial, adresse_appareil) :
@@ -650,7 +634,7 @@ def fonction0x42(port_serial, adresse_appareil) :
     bcc = hex(int(adresse_appareil, 16) + int(fonction, 16))[2:] 
     trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
     port_serial.write(trame)
-    reponse_port = port_serial.read(4).hex()
+    reponse_port = port_serial.read(2).hex()
     if reponse_port == "" : 
         raise NameError("L'appareil n'a pas répondu :( vérifier votre installation ou l'adresse donnée !")
     valeur = int(reponse_port[2:4], 16)

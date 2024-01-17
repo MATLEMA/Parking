@@ -1,13 +1,14 @@
 from serial import Serial
+import threading
 
-def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "") -> str :
+def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "")   -> str :
 
     # Vérifie si adresse_appareil est valide avant tout calcul
     try :
         int(adresse_appareil, 16)
     except ValueError :
         raise ValueError("adresse_appareil en hexadecimal!")
-    print(len(adresse_appareil))
+
     if len(adresse_appareil) not in [2, 4] :
          raise ValueError("adresse_appareil doit être de longeur 2 ou 4!") 
          
@@ -19,12 +20,8 @@ def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "") -> str :
         else : 
             somme = int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(nom_fonction, 16) + int(valeur, 16)
 
-        if somme <= 255 :
-            bcc = format(somme, "02X")
-        elif somme <= 65535 :
-            bcc = format(somme, "04X")
-        else  :
-            bcc = format(somme, "06X")
+        bcc = format(int(str(somme)[0:2]), "02X")
+
         return bcc
 
     # Si l'adresse est 1 octet
@@ -34,12 +31,9 @@ def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "") -> str :
             somme = int(adresse_appareil, 16) + int(nom_fonction, 16)
         else : 
             somme = int(adresse_appareil, 16) + int(nom_fonction, 16) + int(valeur, 16)
-        if somme <= 255 :
-            bcc = format(somme, "02X")
-        elif somme <= 65535 :
-            bcc = format(somme, "04X")
-        else  :
-            bcc = format(somme, "06X")
+
+        bcc = format(int(str(somme)[0:2]), "02X")
+
         return bcc
     else :
         raise ValueError
@@ -66,17 +60,48 @@ def envoi_trame(port_serial: Serial, adresse_appareil : str, nom_fonction: str, 
     raise TimeoutError("L'appareil n'a pas répondu")
 
 class Appareil:
-        def __init__(self , adresse: str, port_serial : Serial, modele : str ,version: float) :
-            self.port_serial = port_serial
-            self.modele = modele
-            self.version = version
-            self.adresse = adresse
+    def __init__(self , adresse: str, port_serial : Serial, modele : str ,version: float) :
+        self.port_serial = port_serial
+        self.modele = modele
+        self.version = version
+        self.adresse = adresse
 
 class SP3(Appareil):
 
-        def __init__(self , adresse: str, port_serial : Serial, modele : str ,version: float):
+        def __init__(
+                self ,
+                adresse: str,
+                port_serial : Serial,
+                modele : str ,
+                version: float,
+                valeur_potentiometre :str = "N/A",
+                valeur_distance_maximal: int | str = "N/A",
+                mode_detection: bool | str = "N/A",
+                mode_transceiver: bool | str = "N/A",
+                _place_libre: bool | str = "N/A"
+                ):
             super().__init__(adresse, port_serial, modele, version)
-        
+            
+
+            try :
+                valeur_potentiometre = self.potentiometre
+                valeur_distance_maximal = self.distance_maximal
+                mode_detection = self.mode_detection
+                mode_transceiver = self.transceiver
+                _place_libre = self.place_libre()
+            except :
+                pass
+
+            self.adresse = adresse
+            self.port_serial = port_serial
+            self.modele = modele
+            self.version = version
+            self.valeur_potentiometre = valeur_potentiometre
+            self.valeur_distance_maximal = valeur_distance_maximal
+            self._mode_detection = mode_detection
+            self.mode_transceiver = mode_transceiver
+            self._place_libre = _place_libre
+
         # Nombre d'envoie de la trame, avant echec
         retry = 5
         
@@ -113,7 +138,7 @@ class SP3(Appareil):
 
         # Fonction 0x04 | Retourne la valeur du potentiomètre digital
         @property
-        def potentiomètre(self) -> str :
+        def potentiometre(self) -> str :
             '''
             Retourne la valeur du potentiomètre digital
              
@@ -130,8 +155,8 @@ class SP3(Appareil):
             return valeur_potentiometre
 
         # Fonction 0x14 | Modifie la valeur du potentiomètre digital
-        @potentiomètre.setter
-        def potentiomètre(self, valeur : str ) -> bool :
+        @potentiometre.setter
+        def potentiometre(self, valeur : str ) -> bool :
             '''
             Modifie la valeur du potentiomètre digital\n
             La fonction confirme que l'appareil à répondu

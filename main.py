@@ -1,9 +1,10 @@
-import subprocess
-
-subprocess.call(['pip', 'install', '-r', 'requirements.txt'])
+from utils import *
+from GUI import *
 
 if __name__ == "__main__" :
 
-    from body_objet import Main
+    import subprocess
 
+    subprocess.call(['pip', 'install', '-r', 'requirements.txt'])
+    
     appli = Main()
