@@ -699,13 +699,13 @@ def fonction0x49(port_serial, adresse_appareil, direction : bool) :
     trame = bytes.fromhex(str(adresse_appareil + fonction + direction_hexa + bcc))
     port_serial.write(trame)
     reponse_port = port_serial.read(2).hex()    # Voir si ça ne casse pas le script
-
-""" # Script combo capteur / display 
+'''
+ # Script combo capteur / display 
 if __name__ == "__main__" :
     
     port, baudrate, timeout, port_serial = test_port_ouvert()
+
     with port_serial :
-        print(detection_appareil(port_serial, False))
         # Variables
         nom_appareil_SP3 : str
         nom_appareil_DX3 : str
@@ -718,13 +718,20 @@ if __name__ == "__main__" :
         print(fonction0x05(port_serial, nom_appareil_SP3))
 
         # Si une place est disponible mettre 1 sur l'afficheur sinon non
-        while True: 
-            if fonction0x10(port_serial, nom_appareil_SP3) == True :
-                compteur_voiture = 1
-                fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture)
-            else : 
-                compteur_voiture = 0
-                fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture) """
+        try:
+            while True: 
+                if fonction0x10(port_serial, nom_appareil_SP3) == True :
+                    compteur_voiture = 1
+                    fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture)
+                else : 
+                    compteur_voiture = 0
+                    fonction0x40(port_serial, nom_appareil_DX3, compteur_voiture) 
+        except KeyboardInterrupt :
+            pass
+            
+        port_serial.close()
+
+'''
 
 if __name__ == "__main__" :
 

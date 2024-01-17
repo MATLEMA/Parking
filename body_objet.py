@@ -76,11 +76,21 @@ class Configuration_SP3(LabelFrame):
         mode_test.grid(column= 1, row= 0, padx= 5, pady= 5)
 
 
-    def ajout_fonction0x01(self):
+    def selection_appareil_listbox(self)  -> SP3:
 
         index: int = self.listbox.curselection()[0]
         appareil: SP3 = self.liste_des_instances_appareil[index]        # ?
+        return appareil
+
+    def ajout_fonction0x01(self):
+
+        appareil = self.selection_appareil_listbox()
         appareil.mode_test()
+
+    def ajout_fonction0x02(self) :
+
+        appareil = self.selection_appareil_listbox()
+        appareil.calibration_potentiomètre()
 
 class Configuration(LabelFrame) :
 
@@ -259,14 +269,22 @@ class Connexion(LabelFrame) :
         self.fonction_rappel_fermer()
         
 
-class fenetre:
-    def __init__(self, parent : Tk) -> None:
+class Main:
+    def __init__(self) -> None:
 
+        parent = Tk()
         self.parent = parent
+
+        centrer_fenetre(parent, largeur, longeur)
+
+        parent.resizable(False, False)
+        parent.title("Parking")
 
         self.fenetre_connexion = Connexion(parent, self.configuration, self.fermer_configuration)
         self.fenetre_connexion.pack(side="left", anchor= "nw")
     
+        parent.mainloop()
+
     def configuration(self, port_actuelle) :
 
         self.application_configuration = Configuration(self.parent, port_actuelle, self.configuration_objet, self.fermer_configuration_objet)
@@ -286,17 +304,3 @@ class fenetre:
 
         if existe:
             self.configuration_objet_SP3.destroy()
-
-class Main :
-    
-    parent = Tk()
-
-    centrer_fenetre(parent, largeur, longeur)
-
-    parent.resizable(False, False)
-    parent.title("Parking")
-        
-    # Appellation des widgets 
-    application_connexion = fenetre(parent)
-
-    parent.mainloop()
