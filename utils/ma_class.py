@@ -2,18 +2,25 @@ from serial import Serial
 import threading
 
 def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "")   -> str :
+    """Calcul la somme des octets en 1 octet
 
+    :param adresse_appareil: adresse hexadécimal d'un appareil
+    :type adresse_appareil: str
+    :param nom_fonction: Nom de la fonction 
+    :type nom_fonction: str
+    :param valeur: valeur optionnel à ajouter si la fonction en a besoin, defaults to ""
+    :type valeur: str, optional
+    :raises ValueError: adresse_appareil en hexadécimal
+    :raises ValueError: adresse_appareil doit être de longeur 2 ou 4!
+    :return: Somme de tout les octets en un seul octet 
+    :rtype: str
+    """
     # Vérifie si adresse_appareil est valide avant tout calcul
     try :
         int(adresse_appareil, 16)
     except ValueError :
-        raise ValueError("adresse_appareil en hexadecimal!")
+        raise ValueError("Adresse_appareil en hexadecimal!")
 
-    if len(adresse_appareil) not in [2, 4] :
-         raise ValueError("adresse_appareil doit être de longeur 2 ou 4!") 
-         
-    
-    # Si l'adresse est de 2 octet
     if len(adresse_appareil) == 4 :
         if valeur == "" :
             somme = int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(nom_fonction, 16) 
@@ -24,7 +31,6 @@ def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "")   -> str 
 
         return bcc
 
-    # Si l'adresse est 1 octet
     elif len(adresse_appareil) == 2 :
 
         if valeur == "" :
@@ -35,11 +41,29 @@ def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "")   -> str 
         bcc = format(int(str(somme)[0:2]), "02X")
 
         return bcc
+    
     else :
-        raise ValueError
+        raise ValueError("Adresse_appareil doit être de longeur 2 ou 4!")
 
 def envoi_trame(port_serial: Serial, adresse_appareil : str, nom_fonction: str, bcc : str, retry : int, valeur = "") -> str :
-    
+    """Envoie un trame sur le port serial renseigné
+
+    :param port_serial: Port COM 
+    :type port_serial: Serial
+    :param adresse_appareil: adresse hexadécimal d'un appareil
+    :type adresse_appareil: str
+    :param nom_fonction: Nom de la fonction 
+    :type nom_fonction: str
+    :param bcc: Somme de tout les octets en un seul octet 
+    :type bcc: str
+    :param retry: Nombre d'essaie si le module echoue
+    :type retry: int
+    :param valeur: valeur optionnel à ajouter si la fonction en a besoin, defaults to ""
+    :type valeur: str, optional
+    :raises TimeoutError: L'appareil n'a pas répondu
+    :return: retourne la trame réponse en hexadécimal
+    :rtype: str
+    """    
     while retry > 0 :
         # Fabrication de la trame à envoyée
         trame_envoyee: bytes = bytes.fromhex(adresse_appareil + nom_fonction + valeur + bcc )
