@@ -1,5 +1,5 @@
 from tkinter import LabelFrame, Listbox, Label, Entry, Button
-from .main import *
+from .application import *
 from utils import *
 
 class Configuration_DX3(LabelFrame):

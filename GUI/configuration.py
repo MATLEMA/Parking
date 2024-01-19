@@ -1,14 +1,12 @@
 from tkinter import LabelFrame, Listbox, Entry, Label, Button, Variable, messagebox
 from serial import Serial
-from .main import *
+from .application import *
 from utils import *
 from .recadrage_fenetre import redefinir_fenetre
 from pprint import pprint, pformat
 
 class Configuration(LabelFrame) :
 
-    dict_des_objets : dict[str, dict[str, str | int | bool | None]] = {}
-    liste_des_instances_appareil: list[SP3 | DX3] = []
 
     def __init__(self, parent, port : Serial, ouvrir_fenetre_SP3, ouvrir_fenetre_DX3, fermer_fenetre_objet ) :
         super().__init__(parent, text= "Configuration")
@@ -19,7 +17,8 @@ class Configuration(LabelFrame) :
         self.existe = None
         self.port_actuelle = port
         self.parent = parent
-
+        self.dict_des_objets : dict[str, dict[str, str | int | bool | None]] = {}
+        self.liste_des_instances_appareil: list[SP3 | DX3] = []
 
         self.variable_pour_liste = Variable()
         self.liste = Listbox(self, listvariable= self.variable_pour_liste)

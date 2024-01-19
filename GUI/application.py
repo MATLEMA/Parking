@@ -20,7 +20,7 @@ class Main:
         parent.resizable(False, False)
         parent.title("Parking")
 
-        self.fenetre_connexion = Connexion(parent, self.configuration, self.fermer_configuration)
+        self.fenetre_connexion = Connexion(parent, self.configuration, self.fermer_configuration, self.fermer_configuration_objet)
         self.fenetre_connexion.pack(side="left", anchor= "nw")
     
         parent.mainloop()

@@ -7,11 +7,13 @@ largeur = 165
 
 class Connexion(LabelFrame) :
     
-    def __init__(self, parent, fonction_rappel_ouvrir, fonction_rappel_fermer) :
+    def __init__(self, parent, fonction_rappel_ouvrir_configuration, fonction_rappel_fermer_configuration, fonction_rappel_fermer_configuration_objet) :
         super().__init__(parent , text= "Connexion")
+
         self.parent = parent
-        self.fonction_rappel_ouvrir = fonction_rappel_ouvrir
-        self.fonction_rappel_fermer = fonction_rappel_fermer
+        self.fonction_rappel_ouvrir_configuration = fonction_rappel_ouvrir_configuration
+        self.fonction_rappel_fermer_configuration = fonction_rappel_fermer_configuration
+        self.fonction_rappel_fermer_configuration_objet = fonction_rappel_fermer_configuration_objet
 
         port_disponible = listing_port()
         self.combobox_port = ttk.Combobox(self, values = port_disponible, state= "readonly")
@@ -24,10 +26,14 @@ class Connexion(LabelFrame) :
         self.combobox_baudrate.set(baudrate_disponible[0])
         self.combobox_baudrate.grid(row=1, column=0, padx=10, pady=10)
 
-        timeout_disponible = ["0" , "0.004", "1"]
+        timeout_disponible = ["0" , "0.015", "0.004", "1"]
         self.combobox_timeout = ttk.Combobox(self, values = timeout_disponible, state= "readonly")
         self.combobox_timeout.set(timeout_disponible[0])
         self.combobox_timeout.grid(row=2, column=0, padx=10, pady=10)
+
+        self.connexion_bouton()
+        
+    def connexion_bouton(self):
 
         self.bouton_connecter = ttk.Button(self, text="Connecter", command= self.script_bouton_connexion)
         self.bouton_connecter.grid(row=3, column=0, padx=10, pady=10)
@@ -55,7 +61,7 @@ class Connexion(LabelFrame) :
             redefinir_fenetre(self.parent, 395, 400)
 
             # Toutes les variables passées dans cette fonction seront envoyer dans la class configuration
-            self.fonction_rappel_ouvrir(self.port_actuelle)
+            self.fonction_rappel_ouvrir_configuration(self.port_actuelle)
 
             self.deconnexion_bouton()
         else : 
@@ -81,4 +87,5 @@ class Connexion(LabelFrame) :
 
         redefinir_fenetre(self.parent, largeur, longeur)
 
-        self.fonction_rappel_fermer()
+        self.fonction_rappel_fermer_configuration_objet()
+        self.fonction_rappel_fermer_configuration()
