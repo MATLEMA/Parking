@@ -58,7 +58,7 @@ class Configuration(LabelFrame) :
         
     def ajout_listbox_SP3(self, objet : SP3 ) :
         
-        self.dict_des_objets[objet.adresse] = {"modele": objet.modele, "port" : objet.port_serial.port, "version" : str(objet.version), "valeur potentiometre" : objet.valeur_potentiometre, "valeur_distance_maximal" : objet.valeur_distance_maximal, "mode_detection" : objet._mode_detection, "mode_transceiver" : objet.mode_transceiver, "place_libre" : objet._place_libre}
+        self.dict_des_objets[objet.adresse] = {"modele": objet.modele, "port" : objet.port_serial.port, "version" : str(objet.version), "valeur_potentiometre" : objet.valeur_potentiometre, "valeur_distance_maximal" : objet.valeur_distance_maximal, "mode_detection" : objet._mode_detection, "mode_transceiver" : objet.mode_transceiver, "place_libre" : objet._place_libre}
         self.liste_des_instances_appareil.append(objet)
         self.maj_listbox()
 
@@ -76,6 +76,11 @@ class Configuration(LabelFrame) :
         
         redefinir_fenetre(self.parent, 795, 400)
         adresse_objet: str = self.liste.selection_get()
+
+        # correction d'un bug si nous selection quelque chose d'autre que dans la listebox cela active ce module 
+        # alors si la selection n'est pas dans la liste nous passons
+        if adresse_objet not in self.dict_des_objets.keys() :
+            return
 
         self.fermer_fenetre_objet()
 

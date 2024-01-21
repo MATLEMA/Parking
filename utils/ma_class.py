@@ -167,7 +167,6 @@ class SP3(Appareil):
             Retourne la valeur du potentiomètre digital
              
             '''
-
             # Nom de la fonction 
             fonction = "04"
 
@@ -175,8 +174,7 @@ class SP3(Appareil):
             reponse = envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry)
 
             # La valeur du potentiomètre digital se trouve sur le 3ème octet de la trame réponse
-            valeur_potentiometre = reponse[4:6]
-            return valeur_potentiometre
+            return reponse[4:6]
 
         # Fonction 0x14 | Modifie la valeur du potentiomètre digital
         @potentiometre.setter
@@ -194,7 +192,6 @@ class SP3(Appareil):
                 raise ValueError("Veuillez saisir une valeur entre 1 et 64")
             
             valeur = str(int(hex(int(valeur)), 16))
-
 
             bcc = calcul_bcc(self.adresse, fonction, valeur)
             reponse = envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry, valeur)
@@ -216,8 +213,8 @@ class SP3(Appareil):
             reponse = envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry)
 
             # La valeur de la distance maximal se trouve sur le 3ème octet de la trame réponse
-            i = int(reponse[4:6], 16)
-            limite_superieur = 80 + i * 10 - 1
+            limite_superieur = 80 + int(reponse[4:6], 16) * 10 - 1
+
             if limite_superieur < 400 and reponse[4:6] != "15" and reponse[4:6] != "16" :
                 return limite_superieur
 
@@ -240,8 +237,7 @@ class SP3(Appareil):
             if int(valeur) < 150 :
                 raise ValueError("Veuillez saisir une valeur entre 1 et 64")
             
-            valeur = valeur//10 * 10
-            valeur = hex(valeur)[2:]
+            valeur = hex(valeur//10 * 10)[2:]
 
             bcc = calcul_bcc(self.adresse, fonction, valeur)
             reponse = envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry, valeur)
@@ -320,6 +316,7 @@ class SP3(Appareil):
             '''
             # Nom de la fonction
             fonction = "13"
+
             if valeur == True : 
                 # En mode reception
                 mode_reception_transmission : str = "00"
@@ -356,8 +353,7 @@ class SP3(Appareil):
             
             dict_couleur_fonction: dict[str, str] = {"vert" : "19", "rouge" : "1A", "orange": "1B"}
 
-            couleur = couleur.lower()
-            if couleur not in dict_couleur_fonction.keys() :
+            if couleur.lower() not in dict_couleur_fonction.keys() :
                 raise SyntaxError("Les couleurs valide sont vert, rouge et orange")
             
             # Connaitre le nom de la fonction voulu
