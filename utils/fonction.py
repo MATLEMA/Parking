@@ -97,7 +97,7 @@ def detection_appareil(port_serial, stop : threading.Event) -> dict[str, str]:
     ''' 
     
     # Constantes
-    database_modele_hexa: dict[str,str] = {"SP1": "02", "D3": "02", "MR4/dp": "0x23", "D4": "0x2E", "DX2-VMS": "0x3B", "DX4-VMS": "0x3D", "DXCA": "0x44", "SP2": "0x1D", "DX3": "0x1E", "DX2": "0x2D", "SP3": "0x2B", "DX3-VMS": "0x3C", "DX-VMS-F": "0x3E", "GS24x8RGB": "0x3F"}
+    database_modele_hexa: dict[str,str] = {"SP1": "02", "D3": "02", "MR4/dp": "23", "D4": "2e", "DX2-VMS": "3b", "DX4-VMS": "3d", "DXCA": "44", "SP2": "1d", "DX3": "1e", "DX2": "2d", "SP3": "2b", "DX3-VMS": "3c", "DX-VMS-F": "3e", "GS24x8RGB": "3f"}
     fonction : str = "05"
     
     # Variables
@@ -280,7 +280,7 @@ def fonction0x04(port_serial, adresse_appareil) :
     return valeur
 
 # Recherche les informations d'un équipement (Nom de l'équipement | version)
-def fonction0x05(port_serial, adresse_appareil: str) -> tuple[str, float, bool]:
+def fonction0x05(port_serial, adresse_appareil: str) -> tuple[str, float]:
     '''
     Cette fonction à besoin d'un port ouvert donné par la variable port_serial ainsi que l'adresse_appareil
     Elle sert à retourner le nom de l'équipement ainsi 
@@ -292,9 +292,9 @@ def fonction0x05(port_serial, adresse_appareil: str) -> tuple[str, float, bool]:
     fonction = "05"
     nom_appareil = "Nan"
     version_appareil = 0
-    appareil_existe = False
 
     dictionnaire_nom_hexa: dict[str,str] = {"SP1": "02", "D3": "02", "MR4/dp": "0x23", "D4": "0x2E", "DX2-VMS": "0x3B", "DX4-VMS": "0x3D", "DXCA": "0x44", "SP2": "0x1D", "DX3": "0x1E", "DX2": "0x2D", "SP3": "0x2B", "DX3-VMS": "0x3C", "DX-VMS-F": "0x3E", "GS24x8RGB": "0x3F"}
+    
     if len(adresse_appareil) == 4 :
         somme = int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16)
         
@@ -314,8 +314,8 @@ def fonction0x05(port_serial, adresse_appareil: str) -> tuple[str, float, bool]:
 
         # Détection de la version de l'objet
         version_appareil = reponse_appareil[6:8]
-        version_appareil = int(version_appareil, 16)/10                                            # 0x1A = 10 (decimal) = version 1.0
-        return nom_appareil, version_appareil, appareil_existe
+        version_appareil = float(int(version_appareil, 16))/10                                            # 0x1A = 10 (decimal) = version 1.0
+        return nom_appareil, version_appareil
             
     elif len(adresse_appareil) == 2 :
 
@@ -339,7 +339,7 @@ def fonction0x05(port_serial, adresse_appareil: str) -> tuple[str, float, bool]:
         # Détection de la version de l'objet
         version_appareil = reponse_appareil[6:8]
         version_appareil = int(version_appareil, 16)/10
-        return nom_appareil, version_appareil, appareil_existe
+        return nom_appareil, version_appareil
     else : 
         raise ValueError
 
