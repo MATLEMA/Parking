@@ -22,12 +22,13 @@ def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "")   -> str 
         raise ValueError("Adresse_appareil en hexadecimal!")
 
     if len(adresse_appareil) == 4 :
+
         if valeur == "" :
             somme = int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(nom_fonction, 16) 
         else : 
             somme = int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(nom_fonction, 16) + int(valeur, 16)
 
-        bcc = format(int(str(somme)[0:2]), "02X")
+        bcc = format(somme, "02x")[:2]
 
         return bcc
 
@@ -38,7 +39,7 @@ def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "")   -> str 
         else : 
             somme = int(adresse_appareil, 16) + int(nom_fonction, 16) + int(valeur, 16)
 
-        bcc = format(int(str(somme)[0:2]), "02X")
+        bcc = format(somme, "02x")[:2]
 
         return bcc
     
@@ -72,13 +73,10 @@ def envoi_trame(port_serial: Serial, adresse_appareil : str, nom_fonction: str, 
         port_serial.write(trame_envoyee)
 
         # Reception de la réponse 
-        if port_serial.in_waiting > 0:
-            trame_reponse = port_serial.read(port_serial.in_waiting)
-            trame_reponse = trame_reponse.hex()
-            if adresse_appareil in trame_reponse :
-                return trame_reponse
-            else :
-                retry -= 1
+        trame_reponse = port_serial.read(port_serial.in_waiting)
+        trame_reponse = trame_reponse.hex()
+        if adresse_appareil in trame_reponse :
+            return trame_reponse
         else :
             retry -= 1
     raise TimeoutError("L'appareil n'a pas répondu")
@@ -171,10 +169,10 @@ class SP3(Appareil):
             fonction = "04"
 
             bcc = calcul_bcc(self.adresse, fonction)
-            reponse = envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry)
+            reponse = str(int(envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry)[4:6], 16))
 
             # La valeur du potentiomètre digital se trouve sur le 3ème octet de la trame réponse
-            return reponse[4:6]
+            return reponse
 
         # Fonction 0x14 | Modifie la valeur du potentiomètre digital
         @potentiometre.setter

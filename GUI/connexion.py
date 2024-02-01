@@ -21,12 +21,12 @@ class Connexion(LabelFrame) :
             self.combobox_port.set(port_disponible[0])
         self.combobox_port.grid(row=0, column=0, padx=10, pady=10)
 
-        baudrate_disponible = ["4800", "9600", "19200" ]
+        baudrate_disponible = ["19200", "9600", "4800" ]
         self.combobox_baudrate = ttk.Combobox(self, values = baudrate_disponible, state= "readonly")
         self.combobox_baudrate.set(baudrate_disponible[0])
         self.combobox_baudrate.grid(row=1, column=0, padx=10, pady=10)
 
-        timeout_disponible = ["0" , "0.015", "0.004", "1"]
+        timeout_disponible = ["0.015", "0", "0.004", "1"]
         self.combobox_timeout = ttk.Combobox(self, values = timeout_disponible, state= "readonly")
         self.combobox_timeout.set(timeout_disponible[0])
         self.combobox_timeout.grid(row=2, column=0, padx=10, pady=10)

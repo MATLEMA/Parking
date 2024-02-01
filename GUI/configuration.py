@@ -110,9 +110,7 @@ class Configuration(LabelFrame) :
 
             if is_valid == True :
                 try :
-                    # nom_appareil, version_appareil, _ = fonction0x05(self.port_actuelle, str(adresse))
-                    nom_appareil = "DX3"
-                    version_appareil = 1.3
+                    nom_appareil, version_appareil = fonction0x05(self.port_actuelle, str(adresse))
                     appareil_verifie = Appareil(adresse, self.port_actuelle, nom_appareil, version_appareil)
                     self.post_assignation_liste(appareil_verifie)
 

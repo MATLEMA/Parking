@@ -65,7 +65,7 @@ def test_port_ouvert() :
 
         # Boucle pour l'adressage du baudrate
         while True :
-            list_baudrate_possible = [4800,9600,19200] 
+            list_baudrate_possible = [19200,9600,4800] 
             baudrate = int(input(f"Veuillez saisir le nombre de bit/s ({list_baudrate_possible}): "))
             if baudrate in list_baudrate_possible :
                 break
@@ -120,7 +120,7 @@ def detection_appareil(port_serial, stop : threading.Event) -> dict[str, str]:
 
         somme = int(test_ping_2_formate, 16) + int(fonction, 16)
 
-        bcc = format(int(str(somme)[0:2]), "02X")
+        bcc = format(somme, "02x")[:2]
 
         print(test_ping_2_formate+fonction+bcc)
         trame = bytes.fromhex(str(test_ping_2_formate + fonction + bcc))
@@ -151,7 +151,7 @@ def detection_appareil(port_serial, stop : threading.Event) -> dict[str, str]:
 
             # Il ce peut que les équipements soit codée de facons à ne jamais avoir une adresse qui pourrait renvoyer un bcc de plus de 1 octet?
 
-            bcc = format(int(str(somme)[0:2]), "02X")
+            bcc = format(somme, "02x")[:2]
 
             print(test_ping_4_formate+fonction+bcc)
             trame = bytes.fromhex(test_ping_4_formate + fonction + bcc)
@@ -293,15 +293,16 @@ def fonction0x05(port_serial, adresse_appareil: str) -> tuple[str, float]:
     nom_appareil = "Nan"
     version_appareil = 0
 
-    dictionnaire_nom_hexa: dict[str,str] = {"SP1": "02", "D3": "02", "MR4/dp": "0x23", "D4": "0x2E", "DX2-VMS": "0x3B", "DX4-VMS": "0x3D", "DXCA": "0x44", "SP2": "0x1D", "DX3": "0x1E", "DX2": "0x2D", "SP3": "0x2B", "DX3-VMS": "0x3C", "DX-VMS-F": "0x3E", "GS24x8RGB": "0x3F"}
+    dictionnaire_nom_hexa: dict[str,str] = {"SP1": "02", "D3": "02", "MR4/dp": "23", "D4": "2e", "DX2-VMS": "3b", "DX4-VMS": "3d", "DXCA": "44", "SP2": "1d", "DX3": "1e", "DX2": "2d", "SP3": "2b", "DX3-VMS": "3c", "DX-VMS-F": "3e", "GS24x8RGB": "3f"}
     
     if len(adresse_appareil) == 4 :
         somme = int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(fonction, 16)
         
-        bcc = format(int(str(somme)[0:2]), "02X")
+        bcc = format(somme, "02x")[:2]
 
         trame = bytes.fromhex(adresse_appareil + fonction + bcc)
-        reponse_appareil = port_serial.read(2).hex()
+        port_serial.write(trame)
+        reponse_appareil = port_serial.read(5).hex()
 
         if reponse_appareil == "" :
             raise NameError("L'appareil n'a pas répondu :( vérifier votre installation ou l'adresse donnée !")   
@@ -314,18 +315,18 @@ def fonction0x05(port_serial, adresse_appareil: str) -> tuple[str, float]:
 
         # Détection de la version de l'objet
         version_appareil = reponse_appareil[6:8]
-        version_appareil = float(int(version_appareil, 16))/10                                            # 0x1A = 10 (decimal) = version 1.0
+        version_appareil = float(int(version_appareil, 16))/10                                            # 0x0A = 10 (decimal) = version 1.0
         return nom_appareil, version_appareil
             
     elif len(adresse_appareil) == 2 :
 
         somme = int(adresse_appareil, 16) + int(fonction, 16)
 
-        bcc = format(int(str(somme)[0:2]), "02X")
+        bcc = format(somme, "02x")[:2]
             
         trame = bytes.fromhex(str(adresse_appareil + fonction + bcc))
         port_serial.write(trame)
-        reponse_appareil = port_serial.read(2).hex()
+        reponse_appareil = port_serial.read(4).hex()
 
         if reponse_appareil == "" :
             raise NameError("L'appareil n'a pas répondu :( vérifier votre installation ou l'adresse donnée !")   
