@@ -59,7 +59,7 @@ class Connexion(LabelFrame) :
             self.combobox_timeout["state"] = "disabled"
 
             #redefinir_fenetre(self.parent, 395, 400)
-            redefinir_fenetre(self.parent, 800, 800)
+            redefinir_fenetre(self.parent, 1600, 800)
 
             # Toutes les variables passées dans cette fonction seront envoyer dans la class configuration
             self.fonction_rappel_ouvrir_configuration(self.port_actuelle)

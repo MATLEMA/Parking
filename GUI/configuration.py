@@ -74,7 +74,7 @@ class Configuration(LabelFrame) :
 
     def selection_objet(self, event) :
         
-        redefinir_fenetre(self.parent, 795, 800)
+        redefinir_fenetre(self.parent, 1600, 800)
         adresse_objet: str = self.liste.selection_get()
 
         # correction d'un bug si nous selection quelque chose d'autre que dans la listebox cela active ce module 
