@@ -46,7 +46,7 @@ def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "")   -> str 
     else :
         raise ValueError("Adresse_appareil doit être de longeur 2 ou 4!")
 
-def envoi_trame(port_serial: Serial, adresse_appareil : str, nom_fonction: str, bcc : str, retry : int, valeur = "") -> str :
+def envoi_trame(port_serial: Serial, adresse_appareil : str, nom_fonction: str, bcc : str, retry : int, valeur: str = "") -> str :
     """Envoie un trame sur le port serial renseigné
 
     :param port_serial: Port COM 
@@ -67,7 +67,11 @@ def envoi_trame(port_serial: Serial, adresse_appareil : str, nom_fonction: str, 
     """    
     while retry > 0 :
         # Fabrication de la trame à envoyée
-        trame_envoyee: bytes = bytes.fromhex(adresse_appareil + nom_fonction + valeur + bcc )
+
+        if valeur != "":
+            valeur= format(valeur, "02")
+
+        trame_envoyee: bytes = bytes.fromhex(adresse_appareil + nom_fonction + str(valeur) + bcc)
 
         # Envoie de la trame 
         port_serial.write(trame_envoyee)
@@ -105,11 +109,11 @@ class SP3(Appareil):
         super().__init__(adresse, port_serial, modele, version)
             
         try :
-            self.potentiometre
-            self.distance_maximal
-            self.mode_detection
-            self.transceiver
-            self.place_libre()
+            valeur_potentiometre = self.potentiometre
+            valeur_distance_maximal = self.distance_maximal
+            mode_detection = self.mode_detection
+            mode_transceiver = self.transceiver
+            _place_libre = self.place_libre()
         except :
             pass
 
@@ -123,9 +127,8 @@ class SP3(Appareil):
         self.mode_transceiver = mode_transceiver
         self._place_libre = _place_libre
 
-
     # Nombre d'envoie de la trame, avant echec
-    retry = 5
+    retry = 3
         
     # Fonction 0x01 | Active ou désactive le mode test du capteur SP3
     def mode_test(self)  -> None:
@@ -187,7 +190,10 @@ class SP3(Appareil):
         fonction = "14"
 
         # Vérifie si la valeur donne est entre 1 et 64
-        if int(valeur) < 1 or int(valeur) > 64 :
+        try :
+            if int(valeur) < 1 or int(valeur) > 64 :
+                raise
+        except:
             raise ValueError("Veuillez saisir une valeur entre 1 et 64")
         
         valeur = str(int(hex(int(valeur)), 16))
@@ -228,7 +234,7 @@ class SP3(Appareil):
             
     # Fonction 0x11 | Modifie la distance maximal du capteur
     @distance_maximal.setter
-    def distance_maximal(self, valeur ) -> bool :
+    def distance_maximal(self, valeur : str) -> bool :
         '''
         Modifie la distance maximal du capteur
         Intervalle = [150,?[\n
@@ -237,10 +243,13 @@ class SP3(Appareil):
         # Nom de la fonction 
         fonction = "11"
 
-        if int(valeur) < 150 :
-            raise ValueError("Veuillez saisir une valeur entre 1 et 64")
-        
-        valeur = hex(valeur//10 * 10)[2:]
+        try:
+            if int(valeur) < 150 :
+                raise
+        except:
+            raise ValueError("Veuillez saisir une valeur entre 150 et (259)")    
+            
+        valeur = hex(int(valeur)//10 * 10)[2:]
 
         bcc = calcul_bcc(self.adresse, fonction, valeur)
         reponse = envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry, valeur)

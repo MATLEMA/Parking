@@ -72,6 +72,8 @@ class Configuration_SP3(LabelFrame):
         _valeur_potentiometre.grid(row= 1, padx= 5, pady= 5)
         mode_calib = Button(potentiometreIO, text="Envoyer", command=self.ajout_fonction0x04)
         mode_calib.grid(row= 2, padx= 5, pady= 5)
+        mode_calib_get = Button(potentiometreIO, text="Recevoir", command=self.get_fonction0x04)
+        mode_calib_get.grid(row= 3, padx= 5, pady= 5)
 
         #-----------------------------------------------------------------------------------------#
         maxdistanceIO = LabelFrame(self, text= "Distance maximal")
@@ -83,6 +85,8 @@ class Configuration_SP3(LabelFrame):
         _valeur_distance_maximal.grid(row= 0, padx= 5, pady= 5)
         return_val_dist_max = Button(maxdistanceIO, text="Envoyer", command=self.ajout_fonction0x06)
         return_val_dist_max.grid(row= 1, padx= 5, pady= 5)
+        return_val_dist_max_get = Button(maxdistanceIO, text="Recevoir", command=self.get_fonction0x06)
+        return_val_dist_max_get.grid(row= 2, padx= 5, pady= 5)
 
         #-----------------------------------------------------------------------------------------#
         mode_detection = LabelFrame(self, text= "Mode de détection")
@@ -94,6 +98,8 @@ class Configuration_SP3(LabelFrame):
         _mode_de_detection.grid(row= 1, padx= 5, pady= 5)
         return_mode_detection = Button(mode_detection, text="Envoyer", command=self.ajout_fonction0x07)
         return_mode_detection.grid(row= 2, padx= 5, pady= 5)
+        return_mode_detection_get = Button(mode_detection, text="Recevoir", command=self.get_fonction0x07)
+        return_mode_detection_get.grid(row= 3, padx= 5, pady= 5)
 
         #-----------------------------------------------------------------------------------------#
         
@@ -105,6 +111,8 @@ class Configuration_SP3(LabelFrame):
         _mode_de_transceiver.grid(row= 0, padx= 5, pady= 5)
         return_mode_transeiver = Button(mode_transceiver, text="Envoyer", command=self.ajout_fonction0x03)
         return_mode_transeiver.grid(row= 1, padx= 5, pady= 5)
+        return_mode_transeiver_get = Button(mode_transceiver, text="Recevoir", command=self.get_fonction0x03)
+        return_mode_transeiver_get.grid(row= 2, padx= 5, pady= 5)
 
         self.isplace_libre = LabelFrame(self, text= "Place libre")
         self.isplace_libre.pack(side="left", anchor="nw")
@@ -127,31 +135,80 @@ class Configuration_SP3(LabelFrame):
 
     def ajout_fonction0x04(self):
         
-        self.appareil.potentiometre = str(self.valeur_potentiometre.get())
+        self.appareil.potentiometre = self.valeur_potentiometre.get()
         self.valeur_potentiometre.set(self.appareil.potentiometre)
+    
+    def get_fonction0x04(self):
+
+        try :
+            valeur_potentiometre = self.appareil.potentiometre
+        except :
+            self.valeur_potentiometre.set("N/A")
+        else :
+            self.valeur_potentiometre.set(valeur_potentiometre)
 
     def ajout_fonction0x06(self):
 
-        self.appareil.distance_maximal = str(self.valeur_distance_maximal.get())
+        self.appareil.distance_maximal = self.valeur_distance_maximal.get()
         self.valeur_distance_maximal.set(self.appareil.distance_maximal)
+
+    def get_fonction0x06(self):
+
+        try :
+            distance_maximal = self.appareil.distance_maximal
+        except :
+            self.valeur_distance_maximal.set("N/A")
+        else :
+            self.valeur_distance_maximal.set(distance_maximal)
 
     def ajout_fonction0x07(self):
 
-        if self.mode_de_detection.get() == "vrai" :
+        mode = self.mode_de_detection.get() 
+        if mode in ["vrai","Vrai","v","V","true","True","t","T"] :
             self.appareil.mode_detection = True
             self.mode_de_detection.set(True)
-        else :
+        elif mode in ["faux","Faux","f","F","false","False"] :
             self.appareil.mode_detection = False
             self.mode_de_detection.set(False)
+        else :
+            raise SyntaxError("Invalide veuillez saisir faux/vrai")
+
+
+    def get_fonction0x07(self):
+        
+        try : 
+            mode = self.appareil.mode_detection
+        except :
+            self.mode_de_detection.set("N/A")
+        else :
+            if mode == True :
+                self.mode_de_detection.set("vrai")
+            else:
+                self.mode_de_detection.set("faux")
 
     def ajout_fonction0x03(self):
 
-        if self.mode_de_transceiver.get() == "vrai" :
-            self.appareil.mode_transceiver = True
+        mode = self.mode_de_transceiver.get()
+        if mode in ["vrai","Vrai","v","V","true","True","t","T"] :
+            self.appareil.transceiver = True
             self.mode_de_transceiver.set(True)
-        else :
-            self.appareil.mode_transceiver = False
+        elif mode in ["faux","Faux","f","F","false","False"] :
+            self.appareil.transceiver = False
             self.mode_de_transceiver.set(False)
+        else :
+            raise SyntaxError("Invalide veuillez saisir faux/vrai")
+        
+    def get_fonction0x03(self):
+
+        try : 
+            mode = self.appareil.transceiver
+        except :
+            self.mode_de_transceiver.set("N/A")
+        else :
+            if mode == True :
+                self.mode_de_transceiver.set("vrai")
+            else:
+                self.mode_de_transceiver.set("faux")
 
     def place_libre_thread(self):
 
@@ -160,5 +217,4 @@ class Configuration_SP3(LabelFrame):
                 self.indicateur.itemconfig(self.cercle, fill= "green")
             else:
                 self.indicateur.itemconfig(self.cercle, fill= "red")
-
             sleep(2)
