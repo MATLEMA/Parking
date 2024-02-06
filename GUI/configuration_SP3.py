@@ -1,4 +1,4 @@
-from tkinter import LabelFrame, Listbox, Label, Entry, Button, Variable, Frame
+from tkinter import LabelFrame, Listbox, Label, Entry, Button, Variable, Frame, Canvas
 from .application import *
 from utils import *
 
@@ -106,6 +106,15 @@ class Configuration_SP3(LabelFrame):
         return_mode_transeiver = Button(mode_transceiver, text="Envoyer", command=self.ajout_fonction0x03)
         return_mode_transeiver.grid(row= 1, padx= 5, pady= 5)
 
+        self.isplace_libre = LabelFrame(self, text= "Place libre")
+        self.isplace_libre.pack(side="left", anchor="nw")
+
+        self.indicateur = Canvas(self.isplace_libre, width= 50, height=50)
+        self.indicateur.pack()
+        self.cercle = self.indicateur.create_oval(5, 5, 45, 45)
+
+        self.thread = threading.Thread(target=self.place_libre_thread)
+        self.thread.start()
 
     def ajout_fonction0x01(self):
 
@@ -143,3 +152,13 @@ class Configuration_SP3(LabelFrame):
         else :
             self.appareil.mode_transceiver = False
             self.mode_de_transceiver.set(False)
+
+    def place_libre_thread(self):
+
+        while True:
+            if self.appareil.place_libre():
+                self.indicateur.itemconfig(self.cercle, fill= "green")
+            else:
+                self.indicateur.itemconfig(self.cercle, fill= "red")
+
+            sleep(2)
