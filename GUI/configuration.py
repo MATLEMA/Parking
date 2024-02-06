@@ -26,7 +26,7 @@ class Configuration(LabelFrame) :
 
         self.post_assignation_liste(self.assignation_class_objet(Appareil("4F31", self.port_actuelle, "SP3", 1.0)))
 
-        self.post_assignation_liste(self.assignation_class_objet(Appareil("4F32", self.port_actuelle, "SP3", 1.0)))
+        self.post_assignation_liste(self.assignation_class_objet(Appareil("4F32", self.port_actuelle, "DX3", 1.0)))
 
         self.liste.bind("<<ListboxSelect>>", self.selection_objet)
 
