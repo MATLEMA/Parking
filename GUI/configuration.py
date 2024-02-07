@@ -64,7 +64,7 @@ class Configuration(LabelFrame) :
 
     def ajout_listbox_DX3(self, objet: DX3) :
 
-        self.dict_des_objets[objet.adresse] = {"modele": objet.modele, "port" : objet.port_serial.port, "version" : str(objet.version)}
+        self.dict_des_objets[objet.adresse] = {"modele": objet.modele, "port" : objet.port_serial.port, "version" : str(objet.version), "valeur_fleche": objet.valeur_fleche,}
         self.liste_des_instances_appareil.append(objet)
         self.maj_listbox()
 

@@ -1,5 +1,4 @@
 from serial import Serial
-import threading
 
 def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "")   -> str :
     """Calcul la somme des octets en 1 octet
@@ -402,11 +401,12 @@ class DX3(Appareil):
                 port_serial : Serial,
                 modele : str ,
                 version: float,
+                valeur_fleche: str = "N/A"
                 ) -> None:
         super().__init__(adresse, port_serial, modele, version)
             
         try :
-            pass
+            valeur_fleche = self.fleche
         except :
             pass
 
@@ -414,6 +414,7 @@ class DX3(Appareil):
         self.port_serial = port_serial
         self.modele = modele
         self.version = version
+        self.valeur_fleche = valeur_fleche
     
     # Nombre d'essaie avant echec
     retry = 3
@@ -438,6 +439,7 @@ class DX3(Appareil):
         trame = bytes.fromhex(str(self.adresse + fonction + "04" + hexa_valeur_un + hexa_valeur_deux + hexa_valeur_trois + hexa_valeur_quatre + bcc))
         self.port_serial.write(trame)
 
+
     @property
     def fleche(self) -> str:
         """Retourne une valeur hexadecimal
@@ -450,8 +452,8 @@ class DX3(Appareil):
         "02": "haut"
         "03": "gauche"
         "04": "bas"
-        "05": "bas-droite"
-        "06": "bas-gauche"
+        "05": "bas-vers-droite"
+        "06": "bas-vers-gauche"
         "07": "haut-droit"
         "08": "bas-droit"
         "09": "bas-gauche"
@@ -461,8 +463,8 @@ class DX3(Appareil):
                                   "02": "haut",
                                   "03": "gauche",
                                   "04": "bas",
-                                  "05": "bas-droite",
-                                  "06": "bas-gauche",
+                                  "05": "bas-vers-droite",
+                                  "06": "bas-vers-gauche",
                                   "07": "haut-droit",
                                   "08": "bas-droit",
                                   "09": "bas-gauche",
@@ -481,9 +483,7 @@ class DX3(Appareil):
     @fleche.setter
     def fleche(self, valeur : str):
 
-        fonction = "4E"
-
-        valeur = hex(int(valeur)//10 * 10)[2:]
+        fonction = "4F"
 
         if valeur not in ["01","02","03","04","05","06","07","08","09","0A"]:
             raise SyntaxError("Veuillez saisir une valeur compris dans : 01, 02, 03, 04, 05, 06, 07, 08, 09, 0A")
