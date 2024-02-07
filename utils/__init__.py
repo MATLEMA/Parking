@@ -1,2 +1,2 @@
 from .fonction import *
-from .ma_class import *
+from .SP3_DX3_class import *

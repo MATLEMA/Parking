@@ -394,7 +394,101 @@ class SP3(Appareil):
         bcc = calcul_bcc(self.adresse, fonction)
         envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry, valeur="64")
 
-class DX3(Appareil) :
+class DX3(Appareil):
+
+    def __init__(
+                self,
+                adresse: str,
+                port_serial : Serial,
+                modele : str ,
+                version: float,
+                ) -> None:
+        super().__init__(adresse, port_serial, modele, version)
+            
+        try :
+            pass
+        except :
+            pass
+
+        self.adresse = adresse
+        self.port_serial = port_serial
+        self.modele = modele
+        self.version = version
     
-    def hello(self):
-        pass
+    # Nombre d'essaie avant echec
+    retry = 3
+
+    def afficheur(self, valeur: str):
+        
+        try : 
+            if int(valeur) < 0 or int(valeur) > 10_000 :
+                raise 
+        except :
+            ValueError("Veuillez saisir un valeur compris entre 0 et 10.000")
+    
+        # Formatage 4 deviendra 0004
+        valeur = "{0:04d}".format(int(valeur))
+        fonction = "40"
+        hexa_valeur_un = hex(ord(valeur[0]))[2:]
+        hexa_valeur_deux = hex(ord(valeur[1]))[2:]
+        hexa_valeur_trois = hex(ord(valeur[2]))[2:]
+        hexa_valeur_quatre = hex(ord(valeur[3]))[2:]
+        bcc = hex(int(self.adresse, 16) + int(fonction, 16) + int("04", 16) + int(hexa_valeur_un, 16) + int(hexa_valeur_deux, 16) + int(hexa_valeur_trois, 16) + int(hexa_valeur_quatre, 16) )[2:]
+        print(str(self.adresse + fonction + "04" + hexa_valeur_un + hexa_valeur_deux + hexa_valeur_trois + hexa_valeur_quatre + bcc))
+        trame = bytes.fromhex(str(self.adresse + fonction + "04" + hexa_valeur_un + hexa_valeur_deux + hexa_valeur_trois + hexa_valeur_quatre + bcc))
+        self.port_serial.write(trame)
+
+    @property
+    def fleche(self) -> str:
+        """Retourne une valeur hexadecimal
+
+        :raises IndexError: L'appareil n'a pas répondu
+        :return: Valeur héxadecimal de la flèche
+        :rtype: str
+
+        "01": "droite"
+        "02": "haut"
+        "03": "gauche"
+        "04": "bas"
+        "05": "bas-droite"
+        "06": "bas-gauche"
+        "07": "haut-droit"
+        "08": "bas-droit"
+        "09": "bas-gauche"
+        "0A": "haut-gauche"
+        """        
+        fleche = {"01": "droite",
+                                  "02": "haut",
+                                  "03": "gauche",
+                                  "04": "bas",
+                                  "05": "bas-droite",
+                                  "06": "bas-gauche",
+                                  "07": "haut-droit",
+                                  "08": "bas-droit",
+                                  "09": "bas-gauche",
+                                  "0A": "haut-gauche"}
+        fonction = "4E"
+        bcc = calcul_bcc(self.adresse, fonction)
+        reponse = envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry)[2:4]
+
+        try :
+            fleche.get(reponse)
+        except:
+            raise IndexError("L'appareil n'a pas répondu!")
+
+        return reponse
+    
+    @fleche.setter
+    def fleche(self, valeur : str):
+
+        fonction = "4E"
+
+        valeur = hex(int(valeur)//10 * 10)[2:]
+
+        if valeur not in ["01","02","03","04","05","06","07","08","09","0A"]:
+            raise SyntaxError("Veuillez saisir une valeur compris dans : 01, 02, 03, 04, 05, 06, 07, 08, 09, 0A")
+        
+        bcc = calcul_bcc(self.adresse, fonction, valeur)
+        envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry, valeur)
+
+    
