@@ -101,6 +101,3 @@ class Configuration_DX3(LabelFrame):
     def affiche(self, valeur: str):
 
         self.appareil.afficheur(valeur)
-
-
-        

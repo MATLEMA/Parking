@@ -108,7 +108,6 @@ def verification_validite_trame(adresse_appareil: str, trame_recu: str) -> bool:
     # <adr><reg><~bcc>
     # <adr><~bcc>
     else:
-        
         division = int(longueur_trame / 2) - 1  # On enleve l'octet du bcc
         for i in range(division):
 
@@ -120,7 +119,7 @@ def verification_validite_trame(adresse_appareil: str, trame_recu: str) -> bool:
         return bcc_recu == bcc
 
 class Appareil:
-    def __init__(self , adresse: str, port_serial : Serial, modele : str ,version: float) :
+    def __init__(self, adresse: str, port_serial : Serial, modele : str ,version: float) :
         self.port_serial = port_serial
         self.modele = modele
         self.version = version
@@ -129,17 +128,17 @@ class Appareil:
 class SP3(Appareil):
 
     def __init__(
-                self,
-                adresse: str,
-                port_serial : Serial,
-                modele : str ,
-                version: float,
-                valeur_potentiometre :str = "N/A",
-                valeur_distance_maximal: int | str = "N/A",
-                mode_detection: bool | str = "N/A",
-                mode_transceiver: bool | str = "N/A",
-                _place_libre: bool | str = "N/A"
-                ) -> None:
+            self,
+            adresse: str,
+            port_serial : Serial,
+            modele : str ,
+            version: float,
+            valeur_potentiometre :str = "N/A",
+            valeur_distance_maximal: int | str = "N/A",
+            mode_detection: bool | str = "N/A",
+            mode_transceiver: bool | str = "N/A",
+            _place_libre: bool | str = "N/A"
+            ) -> None:
         super().__init__(adresse, port_serial, modele, version)
             
         try :
@@ -430,14 +429,13 @@ class SP3(Appareil):
 
 class DX3(Appareil):
 
-    def __init__(
-                self,
-                adresse: str,
-                port_serial : Serial,
-                modele : str ,
-                version: float,
-                valeur_fleche: str = "N/A"
-                ) -> None:
+    def __init__(self,
+                 adresse: str,
+                 port_serial : Serial,
+                 modele : str ,
+                 version: float,
+                 valeur_fleche: str = "N/A"
+                 ) -> None:
         super().__init__(adresse, port_serial, modele, version)
             
         try :
@@ -469,9 +467,32 @@ class DX3(Appareil):
         hexa_valeur_deux = hex(ord(valeur[1]))[2:]
         hexa_valeur_trois = hex(ord(valeur[2]))[2:]
         hexa_valeur_quatre = hex(ord(valeur[3]))[2:]
-        bcc = hex(int(self.adresse, 16) + int(fonction, 16) + int("04", 16) + int(hexa_valeur_un, 16) + int(hexa_valeur_deux, 16) + int(hexa_valeur_trois, 16) + int(hexa_valeur_quatre, 16) )[2:]
-        print(str(self.adresse + fonction + "04" + hexa_valeur_un + hexa_valeur_deux + hexa_valeur_trois + hexa_valeur_quatre + bcc))
-        trame = bytes.fromhex(str(self.adresse + fonction + "04" + hexa_valeur_un + hexa_valeur_deux + hexa_valeur_trois + hexa_valeur_quatre + bcc))
+
+        bcc = hex(int(self.adresse, 16)
+                       + int(fonction, 16)
+                       + int("04", 16)
+                       + int(hexa_valeur_un, 16)
+                       + int(hexa_valeur_deux, 16)
+                       + int(hexa_valeur_trois, 16)
+                       + int(hexa_valeur_quatre, 16))[2:]
+        print(str(
+              self.adresse
+              + fonction
+              + "04"
+              + hexa_valeur_un
+              + hexa_valeur_deux
+              + hexa_valeur_trois
+              + hexa_valeur_quatre
+              + bcc
+            ))
+        trame = bytes.fromhex(str(self.adresse
+                                     + fonction
+                                     + "04"
+                                     + hexa_valeur_un
+                                     + hexa_valeur_deux
+                                     + hexa_valeur_trois
+                                     + hexa_valeur_quatre
+                                     + bcc))
         self.port_serial.write(trame)
 
 
@@ -525,5 +546,3 @@ class DX3(Appareil):
         
         bcc = calcul_bcc(self.adresse, fonction, valeur)
         envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry, valeur)
-
-    

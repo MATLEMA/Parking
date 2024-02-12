@@ -101,13 +101,27 @@ class Configuration(LabelFrame) :
         
     def ajout_listbox_SP3(self, objet : SP3 )  -> None:
         
-        self.dict_des_objets[objet.adresse] = {"modele": objet.modele, "port" : objet.port_serial.port, "version" : str(objet.version), "valeur_potentiometre" : objet.valeur_potentiometre, "valeur_distance_maximal" : objet.valeur_distance_maximal, "mode_detection" : objet._mode_detection, "mode_transceiver" : objet.mode_transceiver, "place_libre" : objet._place_libre}
+        self.dict_des_objets[objet.adresse] = {
+            "modele": objet.modele,
+            "port" : objet.port_serial.port,
+            "version" : str(objet.version),
+            "valeur_potentiometre" : objet.valeur_potentiometre,
+            "valeur_distance_maximal" : objet.valeur_distance_maximal,
+            "mode_detection" : objet._mode_detection,
+            "mode_transceiver" : objet.mode_transceiver,
+            "place_libre" : objet._place_libre
+            }
         self.liste_des_instances_appareil.append(objet)
         self.maj_listbox()
 
     def ajout_listbox_DX3(self, objet: DX3)  -> None:
 
-        self.dict_des_objets[objet.adresse] = {"modele": objet.modele, "port" : objet.port_serial.port, "version" : str(objet.version), "valeur_fleche": objet.valeur_fleche,}
+        self.dict_des_objets[objet.adresse] = {
+            "modele": objet.modele,
+            "port" : objet.port_serial.port,
+            "version" : str(objet.version),
+            "valeur_fleche": objet.valeur_fleche,
+            }
         self.liste_des_instances_appareil.append(objet)
         self.maj_listbox()
 

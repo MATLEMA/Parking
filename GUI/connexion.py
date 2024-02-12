@@ -7,7 +7,13 @@ largeur = 165
 
 class Connexion(LabelFrame) :
     
-    def __init__(self, parent, fonction_rappel_ouvrir_configuration, fonction_rappel_fermer_configuration, fonction_rappel_fermer_configuration_objet) :
+    def __init__(
+            self,
+            parent,
+            fonction_rappel_ouvrir_configuration,
+            fonction_rappel_fermer_configuration,
+            fonction_rappel_fermer_configuration_objet
+            ) :
         super().__init__(parent , text= "Connexion")
 
         self.parent = parent
