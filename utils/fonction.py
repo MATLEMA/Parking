@@ -1,7 +1,11 @@
 import serial
 import serial.tools.list_ports
 import threading
-from SP3_DX3_class import Appareil
+try :
+    from .SP3_DX3_class import Appareil
+    from SP3_DX3_class import Appareil
+except:
+    pass
 from time import sleep
 
 

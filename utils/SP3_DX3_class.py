@@ -84,6 +84,41 @@ def envoi_trame(port_serial: Serial, adresse_appareil : str, nom_fonction: str, 
             retry -= 1
     raise TimeoutError("L'appareil n'a pas répondu")
 
+def verification_validite_trame(adresse_appareil: str, trame_recu: str) -> bool:
+    '''
+    Une trame réponse :
+    <adr>
+    <adrh><adrl>
+    <adr><reg><~bcc>
+    <adr><~bcc>
+    '''
+
+    adresse = adresse_appareil
+    longueur_adresse = len(adresse_appareil)
+    longueur_trame = len(trame_recu)
+    trame_a_traite = trame_recu[:2] # On enleve le bcc
+    bcc_recu = trame_recu[-2:]      # On garde le bcc
+    bcc = 0
+    # La validité s'effectue en vérifiant uniquement si la longueur de la trame == la longueur de l'adresse pour deux cas 
+    # <adr>
+    # <adrh><adrl>
+    if longueur_adresse == longueur_trame:
+        return adresse == trame_recu
+    # La validité s'effectue en vérifiant uniquement si la longueur de la trame > longueur de l'adresse pour tout les autres cas
+    # <adr><reg><~bcc>
+    # <adr><~bcc>
+    else:
+        
+        division = int(longueur_trame / 2) - 1  # On enleve l'octet du bcc
+        for i in range(division):
+
+            resultat = int(trame_a_traite[0:2], 16)
+            trame_a_traite= trame_a_traite[2:]
+
+            bcc = bcc + resultat
+        bcc = format(bcc, "02x")[:2]
+        return bcc_recu == bcc
+
 class Appareil:
     def __init__(self , adresse: str, port_serial : Serial, modele : str ,version: float) :
         self.port_serial = port_serial

@@ -97,4 +97,10 @@ class Configuration_DX3(LabelFrame):
         self.appareil.fleche = hexa_fleche
 
         self.fleche_variable.set(self.appareil.fleche)
+
+    def affiche(self, valeur: str):
+
+        self.appareil.afficheur(valeur)
+
+
         
