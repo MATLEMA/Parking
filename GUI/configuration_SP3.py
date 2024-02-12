@@ -14,7 +14,7 @@ class Configuration_SP3(LabelFrame):
         index: int = self.listbox.curselection()[0]
         self.appareil: SP3 = self.liste_des_instances_appareil[index]
 
-        # Fenetre configuration par défaut
+        # Fenetre de configuration par défaut
 
         config_defaut = Frame(self)
         config_defaut.pack(side="left", anchor="nw")
@@ -56,165 +56,165 @@ class Configuration_SP3(LabelFrame):
 
         #-----------------------------------------------------------------------------------------#
         # Bouton fonction 01
-        mode_test = Button(config_defaut, text="Activer Mode Test", command=self.ajout_fonction0x01)
+        mode_test = Button(config_defaut, text="Activer Mode Test", command=self.si_detection_sol)
         mode_test.grid(row= 8, padx= 5, pady= 5)
 
         #-----------------------------------------------------------------------------------------#
-        potentiometreIO = LabelFrame(self, text= "Potentiomètre" )
-        potentiometreIO.pack(side="left", anchor="nw")
+        potentiometre_labelframe = LabelFrame(self, text= "Potentiomètre" )
+        potentiometre_labelframe.pack(side="left", anchor="nw")
         # Bouton fonction 02
-        mode_calib_auto = Button(potentiometreIO, text="Activer Mode Calibration auto", command=self.ajout_fonction0x02)
-        mode_calib_auto.grid(row= 0, padx= 5, pady= 5)
+        mode_calib_auto_bouton = Button(potentiometre_labelframe, text="Activer Mode Calibration auto", command=self.toggle_calibration_auto)
+        mode_calib_auto_bouton.grid(row= 0, padx= 5, pady= 5)
 
         # Fonctions 04 et 14
-        self.valeur_potentiometre = Variable(potentiometreIO, value=dict_des_objets[self.adresse_objet]["valeur_potentiometre"] ,name="valeur_potentiometre")
-        _valeur_potentiometre = Entry(potentiometreIO,textvariable=self.valeur_potentiometre)
-        _valeur_potentiometre.grid(row= 1, padx= 5, pady= 5)
-        mode_calib = Button(potentiometreIO, text="Envoyer", command=self.ajout_fonction0x04)
-        mode_calib.grid(row= 2, padx= 5, pady= 5)
-        mode_calib_get = Button(potentiometreIO, text="Recevoir", command=self.get_fonction0x04)
-        mode_calib_get.grid(row= 3, padx= 5, pady= 5)
+        self.valeur_potentiometre_variable = Variable(potentiometre_labelframe, value=dict_des_objets[self.adresse_objet]["valeur_potentiometre"] ,name="valeur_potentiometre")
+        valeur_potentiometre_entry = Entry(potentiometre_labelframe,textvariable=self.valeur_potentiometre_variable)
+        valeur_potentiometre_entry.grid(row= 1, padx= 5, pady= 5)
+        mode_calib_bouton_envoyer = Button(potentiometre_labelframe, text="Envoyer", command=self.modifie_valeur_potentiometre)
+        mode_calib_bouton_envoyer.grid(row= 2, padx= 5, pady= 5)
+        mode_calib_bouton_recevoir = Button(potentiometre_labelframe, text="Recevoir", command=self.retourne_valeur_potentiometre)
+        mode_calib_bouton_recevoir.grid(row= 3, padx= 5, pady= 5)
 
         #-----------------------------------------------------------------------------------------#
-        maxdistanceIO = LabelFrame(self, text= "Distance maximal")
-        maxdistanceIO.pack(side="left", anchor="nw")
+        maxdistance_labelframe = LabelFrame(self, text= "Distance maximal")
+        maxdistance_labelframe.pack(side="left", anchor="nw")
 
         # Fonctions 06 et 11
-        self.valeur_distance_maximal = Variable(maxdistanceIO, value= dict_des_objets[self.adresse_objet]["valeur_distance_maximal"] ,name="valeur_distance_maximal")
-        _valeur_distance_maximal = Entry(maxdistanceIO, textvariable= self.valeur_distance_maximal)
-        _valeur_distance_maximal.grid(row= 0, padx= 5, pady= 5)
-        return_val_dist_max = Button(maxdistanceIO, text="Envoyer", command=self.ajout_fonction0x06)
-        return_val_dist_max.grid(row= 1, padx= 5, pady= 5)
-        return_val_dist_max_get = Button(maxdistanceIO, text="Recevoir", command=self.get_fonction0x06)
-        return_val_dist_max_get.grid(row= 2, padx= 5, pady= 5)
+        self.valeur_distance_maximal_variable = Variable(maxdistance_labelframe, value= dict_des_objets[self.adresse_objet]["valeur_distance_maximal"] ,name="valeur_distance_maximal")
+        valeur_distance_maximal_entry = Entry(maxdistance_labelframe, textvariable= self.valeur_distance_maximal_variable)
+        valeur_distance_maximal_entry.grid(row= 0, padx= 5, pady= 5)
+        valeur_distance_maximal_bouton_envoyer = Button(maxdistance_labelframe, text="Envoyer", command=self.modifie_valeur_distance_maximal)
+        valeur_distance_maximal_bouton_envoyer.grid(row= 1, padx= 5, pady= 5)
+        valeur_distance_maximal_bouton_recevoir = Button(maxdistance_labelframe, text="Recevoir", command=self.retourne_valeur_distance_maximal)
+        valeur_distance_maximal_bouton_recevoir.grid(row= 2, padx= 5, pady= 5)
 
         #-----------------------------------------------------------------------------------------#
-        mode_detection = LabelFrame(self, text= "Mode de détection")
-        mode_detection.pack(side="left", anchor="nw")
+        mode_detection_labelframe = LabelFrame(self, text= "Mode de détection")
+        mode_detection_labelframe.pack(side="left", anchor="nw")
 
         # Fonctions 06 et 11
-        self.mode_de_detection = Variable(mode_detection, value= "vrai" if dict_des_objets[self.adresse_objet]["mode_detection"] == True else "faux" ,name="mode_detection")
-        _mode_de_detection = Entry(mode_detection, textvariable= self.mode_de_detection)
-        _mode_de_detection.grid(row= 1, padx= 5, pady= 5)
-        return_mode_detection = Button(mode_detection, text="Envoyer", command=self.ajout_fonction0x07)
-        return_mode_detection.grid(row= 2, padx= 5, pady= 5)
-        return_mode_detection_get = Button(mode_detection, text="Recevoir", command=self.get_fonction0x07)
-        return_mode_detection_get.grid(row= 3, padx= 5, pady= 5)
+        self.mode_de_detection_variable = Variable(mode_detection_labelframe, value= "vrai" if dict_des_objets[self.adresse_objet]["mode_detection"] == True else "faux" ,name="mode_detection")
+        mode_de_detection_entry = Entry(mode_detection_labelframe, textvariable= self.mode_de_detection_variable)
+        mode_de_detection_entry.grid(row= 1, padx= 5, pady= 5)
+        mode_detection_bouton_envoyer = Button(mode_detection_labelframe, text="Envoyer", command=self.modifie_prise_en_compte_detection_sol)
+        mode_detection_bouton_envoyer.grid(row= 2, padx= 5, pady= 5)
+        mode_detection_recevoir = Button(mode_detection_labelframe, text="Recevoir", command=self.retourne_prise_en_compte_detection_sol)
+        mode_detection_recevoir.grid(row= 3, padx= 5, pady= 5)
 
         #-----------------------------------------------------------------------------------------#
         
-        mode_transceiver = LabelFrame(self, text= "Mode transceiver")
-        mode_transceiver.pack(side="left", anchor="nw")
+        mode_transceiver_labelframe = LabelFrame(self, text= "Mode transceiver")
+        mode_transceiver_labelframe.pack(side="left", anchor="nw")
 
-        self.mode_de_transceiver = Variable(mode_transceiver, value= "vrai" if dict_des_objets[self.adresse_objet]["mode_transceiver"] == True else "faux" ,name="mode_transceiver")
-        _mode_de_transceiver = Entry(mode_transceiver, textvariable= self.mode_de_transceiver)
-        _mode_de_transceiver.grid(row= 0, padx= 5, pady= 5)
-        return_mode_transeiver = Button(mode_transceiver, text="Envoyer", command=self.ajout_fonction0x03)
-        return_mode_transeiver.grid(row= 1, padx= 5, pady= 5)
-        return_mode_transeiver_get = Button(mode_transceiver, text="Recevoir", command=self.get_fonction0x03)
-        return_mode_transeiver_get.grid(row= 2, padx= 5, pady= 5)
+        self.mode_de_transceiver_variable = Variable(mode_transceiver_labelframe, value= "vrai" if dict_des_objets[self.adresse_objet]["mode_transceiver"] == True else "faux" ,name="mode_transceiver")
+        mode_de_transceiver_entry = Entry(mode_transceiver_labelframe, textvariable= self.mode_de_transceiver_variable)
+        mode_de_transceiver_entry.grid(row= 0, padx= 5, pady= 5)
+        mode_transeiver_bouton_envoyer = Button(mode_transceiver_labelframe, text="Envoyer", command=self.modifie_transceiver)
+        mode_transeiver_bouton_envoyer.grid(row= 1, padx= 5, pady= 5)
+        mode_transeiver_bouton_recevoir = Button(mode_transceiver_labelframe, text="Recevoir", command=self.retourne_transceiver)
+        mode_transeiver_bouton_recevoir.grid(row= 2, padx= 5, pady= 5)
 
         self.isplace_libre = LabelFrame(self, text= "Place libre")
         self.isplace_libre.pack(side="left", anchor="nw")
 
-        self.indicateur = Canvas(self.isplace_libre, width= 50, height=50)
-        self.indicateur.pack()
-        self.cercle = self.indicateur.create_oval(5, 5, 45, 45)
+        self.indicateur_place_libre = Canvas(self.isplace_libre, width= 50, height=50)
+        self.indicateur_place_libre.pack()
+        self.cercle_place_libre = self.indicateur_place_libre.create_oval(5, 5, 45, 45)
 
-        self.thread = threading.Thread(target=self.place_libre_thread)
-        self.thread.start()
+        self.thread_place_libre = threading.Thread(target=self.place_libre_thread)
+        self.thread_place_libre.start()
 
-    def ajout_fonction0x01(self):
+    def si_detection_sol(self):
 
         self.appareil.mode_test()
 
-    def ajout_fonction0x02(self) :
+    def toggle_calibration_auto(self) :
 
         self.appareil.calibration_potentiomètre()
-        self.valeur_potentiometre.set(self.appareil.potentiometre)
+        self.valeur_potentiometre_variable.set(self.appareil.potentiometre)
 
-    def ajout_fonction0x04(self):
+    def modifie_valeur_potentiometre(self):
         
-        self.appareil.potentiometre = self.valeur_potentiometre.get()
-        self.valeur_potentiometre.set(self.appareil.potentiometre)
+        self.appareil.potentiometre = self.valeur_potentiometre_variable.get()
+        self.valeur_potentiometre_variable.set(self.appareil.potentiometre)
     
-    def get_fonction0x04(self):
+    def retourne_valeur_potentiometre(self):
 
         try :
-            valeur_potentiometre = self.appareil.potentiometre
+            valeur_potentiometre_variable = self.appareil.potentiometre
         except :
-            self.valeur_potentiometre.set("N/A")
+            self.valeur_potentiometre_variable.set("N/A")
         else :
-            self.valeur_potentiometre.set(valeur_potentiometre)
+            self.valeur_potentiometre_variable.set(valeur_potentiometre_variable)
 
-    def ajout_fonction0x06(self):
+    def modifie_valeur_distance_maximal(self):
 
-        self.appareil.distance_maximal = self.valeur_distance_maximal.get()
-        self.valeur_distance_maximal.set(self.appareil.distance_maximal)
+        self.appareil.distance_maximal = self.valeur_distance_maximal_variable.get()
+        self.valeur_distance_maximal_variable.set(self.appareil.distance_maximal)
 
-    def get_fonction0x06(self):
+    def retourne_valeur_distance_maximal(self):
 
         try :
             distance_maximal = self.appareil.distance_maximal
         except :
-            self.valeur_distance_maximal.set("N/A")
+            self.valeur_distance_maximal_variable.set("N/A")
         else :
-            self.valeur_distance_maximal.set(distance_maximal)
+            self.valeur_distance_maximal_variable.set(distance_maximal)
 
-    def ajout_fonction0x07(self):
+    def modifie_prise_en_compte_detection_sol(self):
 
-        mode = self.mode_de_detection.get() 
+        mode = self.mode_de_detection_variable.get() 
         if mode in ["vrai","Vrai","v","V","true","True","t","T"] :
             self.appareil.mode_detection = True
-            self.mode_de_detection.set(True)
+            self.mode_de_detection_variable.set(True)
         elif mode in ["faux","Faux","f","F","false","False"] :
             self.appareil.mode_detection = False
-            self.mode_de_detection.set(False)
+            self.mode_de_detection_variable.set(False)
         else :
             raise SyntaxError("Invalide veuillez saisir faux/vrai")
 
 
-    def get_fonction0x07(self):
+    def retourne_prise_en_compte_detection_sol(self):
         
         try : 
             mode = self.appareil.mode_detection
         except :
-            self.mode_de_detection.set("N/A")
+            self.mode_de_detection_variable.set("N/A")
         else :
             if mode == True :
-                self.mode_de_detection.set("vrai")
+                self.mode_de_detection_variable.set("vrai")
             else:
-                self.mode_de_detection.set("faux")
+                self.mode_de_detection_variable.set("faux")
 
-    def ajout_fonction0x03(self):
+    def modifie_transceiver(self):
 
-        mode = self.mode_de_transceiver.get()
+        mode = self.mode_de_transceiver_variable.get()
         if mode in ["vrai","Vrai","v","V","true","True","t","T"] :
             self.appareil.transceiver = True
-            self.mode_de_transceiver.set(True)
+            self.mode_de_transceiver_variable.set(True)
         elif mode in ["faux","Faux","f","F","false","False"] :
             self.appareil.transceiver = False
-            self.mode_de_transceiver.set(False)
+            self.mode_de_transceiver_variable.set(False)
         else :
             raise SyntaxError("Invalide veuillez saisir faux/vrai")
         
-    def get_fonction0x03(self):
+    def retourne_transceiver(self):
 
         try : 
             mode = self.appareil.transceiver
         except :
-            self.mode_de_transceiver.set("N/A")
+            self.mode_de_transceiver_variable.set("N/A")
         else :
             if mode == True :
-                self.mode_de_transceiver.set("vrai")
+                self.mode_de_transceiver_variable.set("vrai")
             else:
-                self.mode_de_transceiver.set("faux")
+                self.mode_de_transceiver_variable.set("faux")
 
     def place_libre_thread(self):
 
         while True:
             if self.appareil.place_libre():
-                self.indicateur.itemconfig(self.cercle, fill= "green")
+                self.indicateur_place_libre.itemconfig(self.cercle_place_libre, fill= "green")
             else:
-                self.indicateur.itemconfig(self.cercle, fill= "red")
+                self.indicateur_place_libre.itemconfig(self.cercle_place_libre, fill= "red")
             sleep(2)

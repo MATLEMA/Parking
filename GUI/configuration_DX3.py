@@ -83,10 +83,10 @@ class Configuration_DX3(LabelFrame):
         f_bas_vert_droite.grid(column=2, row=3)
         f_bas_vert_gauche.grid(column=0, row=3)
 
-        bouton_envoyer_fleche = Button(fleche, text="Envoyer", command=self.envoyer_fleche)
+        bouton_envoyer_fleche = Button(fleche, text="Envoyer", command=self.modifie_fleche)
         bouton_envoyer_fleche.grid(column=1, row= 1, padx= 5, pady= 5)
 
-    def envoyer_fleche(self) -> None:
+    def modifie_fleche(self) -> None:
 
         hexa_fleche = self.fleche_variable.get()
 
