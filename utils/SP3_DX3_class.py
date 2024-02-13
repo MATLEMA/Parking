@@ -45,7 +45,7 @@ def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "")   -> str 
     else :
         raise ValueError("Adresse_appareil doit être de longeur 2 ou 4!")
 
-def envoi_trame(port_serial: Serial, adresse_appareil : str, nom_fonction: str, bcc : str, retry : int, valeur: str = "") -> str :
+def envoi_trame(port_serial: Serial, adresse_appareil : str, nom_fonction: str, retry : int, valeur: str = "") -> str :
     """Envoie un trame sur le port serial renseigné
 
     :param port_serial: Port COM 
@@ -64,6 +64,8 @@ def envoi_trame(port_serial: Serial, adresse_appareil : str, nom_fonction: str, 
     :return: retourne la trame réponse en hexadécimal
     :rtype: str
     """    
+
+    bcc = calcul_bcc(adresse_appareil, nom_fonction, valeur)
     while retry > 0 :
         # Fabrication de la trame à envoyée
 
@@ -78,7 +80,7 @@ def envoi_trame(port_serial: Serial, adresse_appareil : str, nom_fonction: str, 
         # Reception de la réponse 
         trame_reponse = port_serial.read(10)
         trame_reponse = trame_reponse.hex()
-        if adresse_appareil in trame_reponse :
+        if verification_validite_trame(adresse_appareil, trame_reponse) :
             return trame_reponse
         else :
             retry -= 1
@@ -177,8 +179,7 @@ class SP3(Appareil):
         # Nom de la fonction 
         fonction = "01"
 
-        bcc = calcul_bcc(self.adresse, fonction)
-        envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry)
+        envoi_trame(self.port_serial, self.adresse, fonction, self.retry)
                 
         # Fonction 0x02 | Active ou désactive la calibration du potentiomètre
     def calibration_potentiomètre(self)  -> None:
@@ -191,8 +192,7 @@ class SP3(Appareil):
         # Nom de la fonction
         fonction = "02"
 
-        bcc = calcul_bcc(self.adresse, fonction)
-        envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry)
+        envoi_trame(self.port_serial, self.adresse, fonction, self.retry)
 
     # Fonction 0x04 | Retourne la valeur du potentiomètre digital
     @property
@@ -204,8 +204,7 @@ class SP3(Appareil):
         # Nom de la fonction 
         fonction = "04"
 
-        bcc = calcul_bcc(self.adresse, fonction)
-        reponse = str(int(envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry)[4:6], 16))
+        reponse = str(int(envoi_trame(self.port_serial, self.adresse, fonction, self.retry)[4:6], 16))
 
         # La valeur du potentiomètre digital se trouve sur le 3ème octet de la trame réponse
         self.valeur_potentiometre = reponse
@@ -231,8 +230,7 @@ class SP3(Appareil):
         
         valeur = str(int(hex(int(valeur)), 16))
 
-        bcc = calcul_bcc(self.adresse, fonction, valeur)
-        reponse = envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry, valeur)
+        reponse = envoi_trame(self.port_serial, self.adresse, fonction, self.retry, valeur)
 
         if reponse == self.adresse :
             return True
@@ -248,8 +246,7 @@ class SP3(Appareil):
         # Nom de la fonction 
         fonction = "06"
 
-        bcc = calcul_bcc(self.adresse, fonction)
-        reponse = envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry)
+        reponse = envoi_trame(self.port_serial, self.adresse, fonction, self.retry)
 
         # La valeur de la distance maximal se trouve sur le 3ème octet de la trame réponse
         limite_superieur = 80 + int(reponse[4:6], 16) * 10 - 1
@@ -284,8 +281,7 @@ class SP3(Appareil):
             
         valeur = hex(int(valeur)//10 * 10)[2:]
 
-        bcc = calcul_bcc(self.adresse, fonction, valeur)
-        reponse = envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry, valeur)
+        reponse = envoi_trame(self.port_serial, self.adresse, fonction, self.retry, valeur)
 
         if reponse[4:6] == "00" :
             return True
@@ -302,8 +298,7 @@ class SP3(Appareil):
         # Nom de la fonction 
         fonction = "07"
 
-        bcc = calcul_bcc(self.adresse, fonction)
-        reponse = envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry)
+        reponse = envoi_trame(self.port_serial, self.adresse, fonction, self.retry)
 
         if reponse[4:6] == "00" :
             self._mode_detection = True
@@ -328,8 +323,7 @@ class SP3(Appareil):
         else : 
             mode_detection : str = "FF"
 
-        bcc = calcul_bcc(self.adresse, fonction)
-        reponse = envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry, mode_detection)
+        reponse = envoi_trame(self.port_serial, self.adresse, fonction, self.retry, mode_detection)
 
         if reponse[4:6] == "00" :
             return True
@@ -347,8 +341,7 @@ class SP3(Appareil):
         # Nom de la fonction 
         fonction = "03"
 
-        bcc = calcul_bcc(self.adresse, fonction)
-        reponse = envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry)
+        reponse = envoi_trame(self.port_serial, self.adresse, fonction, self.retry)
         
         if reponse[4:6] == "00" :
             self.mode_transceiver = False
@@ -374,8 +367,7 @@ class SP3(Appareil):
             # En mode reception/transmission
             mode_reception_transmission : str = "FF"
 
-        bcc = calcul_bcc(self.adresse, fonction)
-        reponse = envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry, mode_reception_transmission)
+        reponse = envoi_trame(self.port_serial, self.adresse, fonction, self.retry, mode_reception_transmission)
 
         if reponse == self.adresse :
             return True
@@ -390,8 +382,7 @@ class SP3(Appareil):
         # Nom de la fonction 0x10
         fonction = "10"
 
-        bcc = calcul_bcc(self.adresse, fonction)
-        reponse = envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry)
+        reponse = envoi_trame(self.port_serial, self.adresse, fonction, self.retry)
 
         if reponse[4:6] == "00":
             self._place_libre = True
@@ -411,8 +402,7 @@ class SP3(Appareil):
         # Connaitre le nom de la fonction voulu
         fonction = dict_couleur_fonction[couleur]
 
-        bcc = calcul_bcc(self.adresse, fonction)
-        envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry)
+        envoi_trame(self.port_serial, self.adresse, fonction, self.retry)
         
     # Fonction 0x15 | Force le capteur à clignoter lorsque la place est libre
     def glignoter_libre(self)  -> None:
@@ -424,8 +414,7 @@ class SP3(Appareil):
         # Nom de la fonction 
         fonction = "15"
 
-        bcc = calcul_bcc(self.adresse, fonction)
-        envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry, valeur="64")
+        envoi_trame(self.port_serial, self.adresse, fonction, self.retry, valeur="64")
 
 class DX3(Appareil):
 
@@ -468,34 +457,11 @@ class DX3(Appareil):
         hexa_valeur_trois = hex(ord(valeur[2]))[2:]
         hexa_valeur_quatre = hex(ord(valeur[3]))[2:]
 
-        bcc = hex(int(self.adresse, 16)
-                       + int(fonction, 16)
-                       + int("04", 16)
-                       + int(hexa_valeur_un, 16)
-                       + int(hexa_valeur_deux, 16)
-                       + int(hexa_valeur_trois, 16)
-                       + int(hexa_valeur_quatre, 16))[2:]
-        print(str(
-              self.adresse
-              + fonction
-              + "04"
-              + hexa_valeur_un
-              + hexa_valeur_deux
-              + hexa_valeur_trois
-              + hexa_valeur_quatre
-              + bcc
-            ))
-        trame = bytes.fromhex(str(self.adresse
-                                     + fonction
-                                     + "04"
-                                     + hexa_valeur_un
-                                     + hexa_valeur_deux
-                                     + hexa_valeur_trois
-                                     + hexa_valeur_quatre
-                                     + bcc))
-        self.port_serial.write(trame)
+        valeur = f"04{hexa_valeur_un}{hexa_valeur_deux}{hexa_valeur_trois}{hexa_valeur_quatre}"
+        valeur = "04" + "30" + "34" + "35" + "37"
+        envoi_trame(self.port_serial, self.adresse, fonction, self.retry, valeur)
 
-
+        ######### IL SE PEUT QUE LE DX3 NE PEUT QUE PRENDRE 3 CARACTERES NON 4###################
     @property
     def fleche(self) -> str:
         """Retourne une valeur hexadecimal
@@ -526,8 +492,7 @@ class DX3(Appareil):
                                   "09": "bas-gauche",
                                   "0A": "haut-gauche"}
         fonction = "4E"
-        bcc = calcul_bcc(self.adresse, fonction)
-        reponse = envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry)[2:4]
+        reponse = envoi_trame(self.port_serial, self.adresse, fonction, self.retry)[2:4]
 
         try :
             fleche.get(reponse)
@@ -544,5 +509,4 @@ class DX3(Appareil):
         if valeur not in ["01","02","03","04","05","06","07","08","09","0A"]:
             raise SyntaxError("Veuillez saisir une valeur compris dans : 01, 02, 03, 04, 05, 06, 07, 08, 09, 0A")
         
-        bcc = calcul_bcc(self.adresse, fonction, valeur)
-        envoi_trame(self.port_serial, self.adresse, fonction, bcc, self.retry, valeur)
+        envoi_trame(self.port_serial, self.adresse, fonction, self.retry, valeur)
