@@ -26,7 +26,7 @@ class Configuration(LabelFrame) :
         # Test
         self.ajout_objet(Appareil("4F31", self.port_actuelle, "SP3", 1.0))
 
-        self.ajout_objet(Appareil("4F32", self.port_actuelle, "DX3", 1.0))
+        self.ajout_objet(Appareil("4E", self.port_actuelle, "DX3", 1.0))
 
         # Permet de "bind" la sélection dans la listebox avec une fonction ici la fonction permettant d'ouvrir une fenetre
         self.liste.bind("<<ListboxSelect>>", self.selection_objet)

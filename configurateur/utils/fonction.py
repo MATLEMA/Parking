@@ -2,8 +2,8 @@ import serial
 import serial.tools.list_ports
 import threading
 try :
-    from .SP3_DX3_class import Appareil
-    from SP3_DX3_class import Appareil
+    from .SP3 import Appareil
+    from utils.SP3 import Appareil
 except:
     pass
 from time import sleep

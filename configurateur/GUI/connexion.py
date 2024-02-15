@@ -1,6 +1,7 @@
 from utils import *
 from tkinter import ttk, LabelFrame, messagebox
 from .recadrage_fenetre import redefinir_fenetre, centrer_fenetre
+from serial import Serial
 
 longeur = 185
 largeur = 165

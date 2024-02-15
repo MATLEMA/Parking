@@ -83,21 +83,32 @@ class Configuration_DX3(LabelFrame):
         f_bas_vert_droite.grid(column=2, row=3)
         f_bas_vert_gauche.grid(column=0, row=3)
 
-        bouton_envoyer_fleche = Button(fleche, text="Envoyer", command=self.modifie_fleche)
-        bouton_envoyer_fleche.grid(column=1, row= 1, padx= 5, pady= 5)
+        fleche_bouton_envoyer = Button(fleche, text="Envoyer", command=self.modifie_fleche)
+        fleche_bouton_envoyer.grid(column=1, row= 1, padx= 5, pady= 5)
+
+        afficheur_labelframe = LabelFrame(self, text="Afficheur")
+        afficheur_labelframe.pack(side="left", anchor="nw")
+
+        # Fonction 40
+        numero_variable = Variable(afficheur_labelframe, value="0000")
+        self.numero_entry = Entry(afficheur_labelframe, textvariable=numero_variable)
+        self.numero_entry.grid(row=0)
+        numero_bouton_envoyer = Button(afficheur_labelframe, text="Envoyer", command=self.modifie_afficheur)
+        numero_bouton_envoyer.grid(row=1)
 
     def modifie_fleche(self) -> None:
 
         hexa_fleche = self.fleche_variable.get()
 
         if hexa_fleche == "N/A":
-            print("Incorrect")
-            return
+            return print("Incorrect")
+
         
         self.appareil.fleche = hexa_fleche
 
         self.fleche_variable.set(self.appareil.fleche)
 
-    def affiche(self, valeur: str):
+    def modifie_afficheur(self):
 
+        valeur: str = self.numero_entry.get()
         self.appareil.afficheur(valeur)

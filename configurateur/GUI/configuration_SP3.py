@@ -1,6 +1,8 @@
 from tkinter import LabelFrame, Listbox, Label, Entry, Button, Variable, Frame, Canvas
 from .application import *
 from utils import *
+from threading import Thread
+from time import sleep
 
 class Configuration_SP3(LabelFrame):
 
@@ -121,7 +123,7 @@ class Configuration_SP3(LabelFrame):
         self.indicateur_place_libre.pack()
         self.cercle_place_libre = self.indicateur_place_libre.create_oval(5, 5, 45, 45)
 
-        self.thread_place_libre = threading.Thread(target=self.place_libre_thread)
+        self.thread_place_libre = Thread(target=self.place_libre_thread)
         self.thread_place_libre.start()
 
     def si_detection_sol(self):
