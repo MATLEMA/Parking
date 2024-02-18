@@ -10,11 +10,11 @@ class SP3(Appareil):
             port_serial : Serial,
             modele : str ,
             version: float,
-            valeur_potentiometre :str = "N/A",
-            valeur_distance_maximal: int | str = "N/A",
-            mode_detection: bool | str = "N/A",
-            mode_transceiver: bool | str = "N/A",
-            _place_libre: bool | str = "N/A"
+            valeur_potentiometre :str = "N/A",#TODO supprime
+            valeur_distance_maximal: int | str = "N/A",#TODO supprime
+            mode_detection: bool | str = "N/A",             #TODO supprime
+            mode_transceiver: bool | str = "N/A",#TODO supprime
+            _place_libre: bool | str = "N/A"#TODO supprime
             ) -> None:
         super().__init__(adresse, port_serial, modele, version)
             

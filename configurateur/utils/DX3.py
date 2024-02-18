@@ -9,7 +9,7 @@ class DX3(Appareil):
                  port_serial : Serial,
                  modele : str ,
                  version: float,
-                 valeur_fleche: str = "N/A"
+                 valeur_fleche: str = "N/A"#TODO supprime
                  ) -> None:
         super().__init__(adresse, port_serial, modele, version)
             
@@ -31,7 +31,7 @@ class DX3(Appareil):
         
         try : 
             if int(valeur) < 0 or int(valeur) > 10_000 :
-                raise 
+                pass
         except :
             ValueError("Veuillez saisir un valeur compris entre 0 et 10.000")
     

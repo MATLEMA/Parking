@@ -94,5 +94,4 @@ class Connexion(LabelFrame) :
 
         redefinir_fenetre(self.parent, largeur, longeur)
         
-        self.fonction_rappel_fermer_configuration_objet()
         self.fonction_rappel_fermer_configuration()
