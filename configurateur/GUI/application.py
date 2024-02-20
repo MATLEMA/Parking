@@ -6,8 +6,10 @@ from .configuration_SP3 import Configuration_SP3
 from .configuration_DX3 import Configuration_DX3
 from .recadrage_fenetre import centrer_fenetre
 
-longeur = 185
+longueur = 185
 largeur = 165
+
+# Ajouter longueur et largeur pour configuration
 
 class Main:
     def __init__(self) -> None:
@@ -15,9 +17,9 @@ class Main:
         parent = Tk()
         self.parent = parent
 
-        centrer_fenetre(parent, largeur, longeur)
+        centrer_fenetre(parent, largeur, longueur)
 
-        parent.resizable(False, False)
+        parent.resizable(True, True)
         parent.title("Parking")
 
         self.fenetre_connexion = Connexion(parent, self.ouvrir_configuration, self.fermer_configuration, self.fermer_configuration_objets)

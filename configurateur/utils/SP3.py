@@ -38,7 +38,7 @@ class SP3(Appareil):
         self._place_libre = _place_libre
 
     # Nombre d'envoie de la trame, avant echec
-    retry = 2
+    retry = 1
         
     # Fonction 0x01 | Active ou désactive le mode test du capteur SP3
     def mode_test(self)  -> None:

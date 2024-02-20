@@ -90,7 +90,7 @@ class Configuration_DX3(LabelFrame):
         afficheur_labelframe.pack(side="left", anchor="nw")
 
         # Fonction 40
-        numero_variable = Variable(afficheur_labelframe, value="0000")
+        numero_variable = Variable(afficheur_labelframe, value="000")
         self.numero_entry = Entry(afficheur_labelframe, textvariable=numero_variable)
         self.numero_entry.grid(row=0)
         numero_bouton_envoyer = Button(afficheur_labelframe, text="Envoyer", command=self.modifie_afficheur)
@@ -103,12 +103,14 @@ class Configuration_DX3(LabelFrame):
         if hexa_fleche == "N/A":
             return print("Incorrect")
 
-        
         self.appareil.fleche = hexa_fleche
-
         self.fleche_variable.set(self.appareil.fleche)
 
     def modifie_afficheur(self):
 
         valeur: str = self.numero_entry.get()
+
+        if len(valeur) > 3:
+            self.numero_entry.delete(3, "end")
+            
         self.appareil.afficheur(valeur)
