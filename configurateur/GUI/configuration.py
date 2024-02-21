@@ -18,6 +18,7 @@ class Configuration(LabelFrame) :
         self.parent = parent
         self.dict_des_objets : dict[str, dict[str, str | int | bool | None]] = {}
         self.liste_des_instances_appareil: list[SP3 | DX3] = []
+        self.fenetre_ouverte = "00"
 
         self.variable_pour_liste = Variable()
         self.liste = Listbox(self, listvariable= self.variable_pour_liste)
@@ -104,12 +105,7 @@ class Configuration(LabelFrame) :
         self.dict_des_objets[objet.adresse] = {
             "modele": objet.modele,
             "port" : objet.port_serial.port,
-            "version" : str(objet.version),
-            "valeur_potentiometre" : objet.valeur_potentiometre,
-            "valeur_distance_maximal" : objet.valeur_distance_maximal,
-            "mode_detection" : objet._mode_detection,
-            "mode_transceiver" : objet.mode_transceiver,
-            "place_libre" : objet._place_libre
+            "version" : str(objet.version)
             }
         self.liste_des_instances_appareil.append(objet)
         self.maj_listbox()
@@ -120,7 +116,6 @@ class Configuration(LabelFrame) :
             "modele": objet.modele,
             "port" : objet.port_serial.port,
             "version" : str(objet.version),
-            "valeur_fleche": objet.valeur_fleche,
             }
         self.liste_des_instances_appareil.append(objet)
         self.maj_listbox()
@@ -136,6 +131,9 @@ class Configuration(LabelFrame) :
             adresse_objet: str = self.liste.selection_get()
         except :
             return
+        
+        if self.fenetre_ouverte == adresse_objet:
+            return
 
         # correction d'un bug si nous selections quelque chose d'autre que dans la listebox cela active ce module 
         # alors si la selection n'est pas dans la liste nous passons
@@ -149,3 +147,4 @@ class Configuration(LabelFrame) :
 
         if str(self.dict_des_objets[adresse_objet]["modele"]) == "DX3" :
             self.ouvrir_fenetre_DX3(self.dict_des_objets, self.liste_des_instances_appareil, self.liste)
+        self.fenetre_ouverte = adresse_objet

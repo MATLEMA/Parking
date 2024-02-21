@@ -1,4 +1,4 @@
-from tkinter import LabelFrame, Listbox, Label, Entry, Button, Variable, Frame, Canvas
+from tkinter import LabelFrame, Listbox, Label, Entry, Button, Variable, Frame, Canvas, ttk
 from .application import *
 from utils import *
 from threading import Thread
@@ -69,8 +69,11 @@ class Configuration_SP3(LabelFrame):
         mode_calib_auto_bouton.grid(row= 0, padx= 5, pady= 5)
 
         # Fonctions 04 et 14
-        self.valeur_potentiometre_variable = Variable(potentiometre_labelframe, value=dict_des_objets[self.adresse_objet]["valeur_potentiometre"] ,name="valeur_potentiometre")
-        valeur_potentiometre_entry = Entry(potentiometre_labelframe,textvariable=self.valeur_potentiometre_variable)
+        self.valeur_potentiometre_variable = Variable(potentiometre_labelframe, name="valeur_potentiometre")
+        self.retourne_valeur_potentiometre()
+        option_valeur_potentiometre: list[str] = [str(i) for i in range(1, 65)]
+        option_valeur_potentiometre.append("N/A")
+        valeur_potentiometre_entry = ttk.Combobox(potentiometre_labelframe,textvariable=self.valeur_potentiometre_variable, values=option_valeur_potentiometre)
         valeur_potentiometre_entry.grid(row= 1, padx= 5, pady= 5)
         mode_calib_bouton_envoyer = Button(potentiometre_labelframe, text="Envoyer", command=self.modifie_valeur_potentiometre)
         mode_calib_bouton_envoyer.grid(row= 2, padx= 5, pady= 5)
@@ -82,8 +85,11 @@ class Configuration_SP3(LabelFrame):
         maxdistance_labelframe.pack(side="left", anchor="nw")
 
         # Fonctions 06 et 11
-        self.valeur_distance_maximal_variable = Variable(maxdistance_labelframe, value= dict_des_objets[self.adresse_objet]["valeur_distance_maximal"] ,name="valeur_distance_maximal")
-        valeur_distance_maximal_entry = Entry(maxdistance_labelframe, textvariable= self.valeur_distance_maximal_variable)
+        self.valeur_distance_maximal_variable = Variable(maxdistance_labelframe, name="valeur_distance_maximal")
+        self.retourne_valeur_distance_maximal()
+        option_valeur_distance_maximal: list[str] = [str(i) for i in range(150, 401)]
+        option_valeur_distance_maximal.append("N/A")
+        valeur_distance_maximal_entry = ttk.Combobox(maxdistance_labelframe, textvariable= self.valeur_distance_maximal_variable, values=option_valeur_distance_maximal)
         valeur_distance_maximal_entry.grid(row= 0, padx= 5, pady= 5)
         valeur_distance_maximal_bouton_envoyer = Button(maxdistance_labelframe, text="Envoyer", command=self.modifie_valeur_distance_maximal)
         valeur_distance_maximal_bouton_envoyer.grid(row= 1, padx= 5, pady= 5)
@@ -95,8 +101,10 @@ class Configuration_SP3(LabelFrame):
         mode_detection_labelframe.pack(side="left", anchor="nw")
 
         # Fonctions 06 et 11
-        self.mode_de_detection_variable = Variable(mode_detection_labelframe, value= "vrai" if dict_des_objets[self.adresse_objet]["mode_detection"] == True else "faux" ,name="mode_detection")
-        mode_de_detection_entry = Entry(mode_detection_labelframe, textvariable= self.mode_de_detection_variable)
+        self.mode_de_detection_variable = Variable(mode_detection_labelframe, name="mode_detection")
+        self.retourne_prise_en_compte_detection_sol()
+        option_mode_de_detection: list[str] = ["vrai", "faux", "N/A"]
+        mode_de_detection_entry = ttk.Combobox(mode_detection_labelframe, textvariable= self.mode_de_detection_variable, values=option_mode_de_detection)
         mode_de_detection_entry.grid(row= 1, padx= 5, pady= 5)
         mode_detection_bouton_envoyer = Button(mode_detection_labelframe, text="Envoyer", command=self.modifie_prise_en_compte_detection_sol)
         mode_detection_bouton_envoyer.grid(row= 2, padx= 5, pady= 5)
@@ -108,8 +116,9 @@ class Configuration_SP3(LabelFrame):
         mode_transceiver_labelframe = LabelFrame(self, text= "Mode transceiver")
         mode_transceiver_labelframe.pack(side="left", anchor="nw")
 
-        self.mode_de_transceiver_variable = Variable(mode_transceiver_labelframe, value= "vrai" if dict_des_objets[self.adresse_objet]["mode_transceiver"] == True else "faux" ,name="mode_transceiver")
-        mode_de_transceiver_entry = Entry(mode_transceiver_labelframe, textvariable= self.mode_de_transceiver_variable)
+        self.mode_de_transceiver_variable = Variable(mode_transceiver_labelframe, name="mode_transceiver")
+        self.retourne_transceiver()
+        mode_de_transceiver_entry = ttk.Combobox(mode_transceiver_labelframe, textvariable= self.mode_de_transceiver_variable, values=option_mode_de_detection)
         mode_de_transceiver_entry.grid(row= 0, padx= 5, pady= 5)
         mode_transeiver_bouton_envoyer = Button(mode_transceiver_labelframe, text="Envoyer", command=self.modifie_transceiver)
         mode_transeiver_bouton_envoyer.grid(row= 1, padx= 5, pady= 5)
@@ -123,7 +132,7 @@ class Configuration_SP3(LabelFrame):
         self.indicateur_place_libre.pack()
         self.cercle_place_libre = self.indicateur_place_libre.create_oval(5, 5, 45, 45)
 
-        self.thread_place_libre = Thread(target=self.place_libre_thread)
+        self.thread_place_libre = Thread(target=self.place_libre_thread, daemon=True)
         self.thread_place_libre.start()
 
     def si_detection_sol(self):
@@ -143,11 +152,9 @@ class Configuration_SP3(LabelFrame):
     def retourne_valeur_potentiometre(self):
 
         try :
-            valeur_potentiometre_variable = self.appareil.potentiometre
+            self.valeur_potentiometre_variable.set(self.appareil.potentiometre)
         except :
             self.valeur_potentiometre_variable.set("N/A")
-        else :
-            self.valeur_potentiometre_variable.set(valeur_potentiometre_variable)
 
     def modifie_valeur_distance_maximal(self):
 
@@ -157,11 +164,9 @@ class Configuration_SP3(LabelFrame):
     def retourne_valeur_distance_maximal(self):
 
         try :
-            distance_maximal = self.appareil.distance_maximal
+            self.valeur_distance_maximal_variable.set(self.appareil.distance_maximal)
         except :
             self.valeur_distance_maximal_variable.set("N/A")
-        else :
-            self.valeur_distance_maximal_variable.set(distance_maximal)
 
     def modifie_prise_en_compte_detection_sol(self):
 
@@ -191,10 +196,10 @@ class Configuration_SP3(LabelFrame):
     def modifie_transceiver(self):
 
         mode = self.mode_de_transceiver_variable.get()
-        if mode in ["vrai","Vrai","v","V","true","True","t","T"] :
+        if mode == "vrai" :
             self.appareil.transceiver = True
             self.mode_de_transceiver_variable.set(True)
-        elif mode in ["faux","Faux","f","F","false","False"] :
+        elif mode == "faux" :
             self.appareil.transceiver = False
             self.mode_de_transceiver_variable.set(False)
         else :
@@ -214,9 +219,12 @@ class Configuration_SP3(LabelFrame):
 
     def place_libre_thread(self):
 
-        while True:
+        try :
             if self.appareil.place_libre():
                 self.indicateur_place_libre.itemconfig(self.cercle_place_libre, fill= "green")
             else:
                 self.indicateur_place_libre.itemconfig(self.cercle_place_libre, fill= "red")
-            sleep(2)
+        except: 
+            sleep(10)
+        sleep(2)
+        self.place_libre_thread()

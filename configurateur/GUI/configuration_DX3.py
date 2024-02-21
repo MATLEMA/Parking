@@ -1,4 +1,4 @@
-from tkinter import LabelFrame, Listbox, Label, Entry, Button, Variable, Frame, Radiobutton, StringVar
+from tkinter import LabelFrame, Listbox, Label, Entry, Button, Variable, Frame, Radiobutton, StringVar, ttk
 from .application import *
 from utils import *
 
@@ -60,7 +60,7 @@ class Configuration_DX3(LabelFrame):
         fleche.pack(side="left", anchor="nw")
 
         # Fonctions 4E et 4F
-        self.fleche_variable = StringVar(value=dict_des_objets[self.adresse_objet]["valeur_fleche"]) # type: ignore
+        self.fleche_variable = StringVar()
         f_haut_gauche = Radiobutton(fleche, text=u"\u2196", font=("Courier", 30), variable= self.fleche_variable, value="0A") 
         f_haut = Radiobutton(fleche, text=u"\u2191", font=("Courier", 30), variable= self.fleche_variable, value="02")
         f_haut_droite = Radiobutton(fleche, text=u"\u2197", font=("Courier", 30), variable= self.fleche_variable, value="07")
@@ -96,6 +96,15 @@ class Configuration_DX3(LabelFrame):
         numero_bouton_envoyer = Button(afficheur_labelframe, text="Envoyer", command=self.modifie_afficheur)
         numero_bouton_envoyer.grid(row=1)
 
+        # Fonction 4A et 4B
+        self.parking_plein_variable = Variable(afficheur_labelframe)
+        self.retourne_parking_plein()
+        option_parking_plein: list[str]= ["Croix rouge", "Flèche rouge", "Full", "HEt"]
+        self.parking_plein_combobox = ttk.Combobox(afficheur_labelframe, textvariable=self.parking_plein_variable, values=option_parking_plein)
+        self.parking_plein_combobox.grid(row=0)
+        parking_plein_envoyer = Button(afficheur_labelframe, text="Envoyer", command=self.modifie_parking_plein)
+        parking_plein_envoyer.grid(row=1)
+
     def modifie_fleche(self) -> None:
 
         hexa_fleche = self.fleche_variable.get()
@@ -106,6 +115,13 @@ class Configuration_DX3(LabelFrame):
         self.appareil.fleche = hexa_fleche
         self.fleche_variable.set(self.appareil.fleche)
 
+    def retourne_fleche(self):
+
+        try:
+            self.fleche_variable.set(self.appareil.fleche)
+        except:
+            self.fleche_variable.set("N/A")
+
     def modifie_afficheur(self):
 
         valeur: str = self.numero_entry.get()
@@ -114,3 +130,25 @@ class Configuration_DX3(LabelFrame):
             self.numero_entry.delete(3, "end")
             
         self.appareil.afficheur(valeur)
+
+    def modifie_parking_plein(self):
+        
+        valeur: str = self.parking_plein_combobox.get()
+
+        match valeur:
+            case "Croix rouge":
+                self.appareil.parking_plein = "41"
+            case "Flèche rouge":
+                self.appareil.parking_plein = "43"
+            case "Full":
+                self.appareil.parking_plein = "80"
+            case "HEt":
+                self.appareil.parking_plein = "81"
+        self.parking_plein_combobox.set(self.appareil.parking_plein)
+
+    def retourne_parking_plein(self):
+        try :
+            self.parking_plein_variable.set(self.appareil.parking_plein)
+        except:
+            self.parking_plein_variable.set("N/A")
+                

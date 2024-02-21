@@ -8,13 +8,16 @@ class DX3(Appareil):
                  adresse: str,
                  port_serial : Serial,
                  modele : str ,
-                 version: float,
-                 valeur_fleche: str = "N/A"#TODO supprime
+                 version: float
                  ) -> None:
         super().__init__(adresse, port_serial, modele, version)
-            
+        
+        valeur_fleche: str = "N/A"
+        valeur_parking_plein: str = "N/A"
+
         try :
             valeur_fleche = self.fleche
+            valeur_parking_plein = self.parking_plein
         except :
             pass
 
@@ -23,6 +26,7 @@ class DX3(Appareil):
         self.modele = modele
         self.version = version
         self.valeur_fleche = valeur_fleche
+        self.valeur_parking_plein = valeur_parking_plein
     
     # Nombre d'essaie avant echec
     retry = 1
@@ -66,23 +70,13 @@ class DX3(Appareil):
         "09": "bas-gauche"
         "0A": "haut-gauche"
         """        
-        fleche = {"01": "droite",
-                                  "02": "haut",
-                                  "03": "gauche",
-                                  "04": "bas",
-                                  "05": "bas-vers-droite",
-                                  "06": "bas-vers-gauche",
-                                  "07": "haut-droit",
-                                  "08": "bas-droit",
-                                  "09": "bas-gauche",
-                                  "0A": "haut-gauche"}
         fonction = "4E"
         print("getter fleche")
         reponse = envoi_trame(self.port_serial, self.adresse, fonction, self.retry)[2:4]
         return reponse
     
     @fleche.setter
-    def fleche(self, valeur : str):
+    def fleche(self, valeur : str) -> None:
 
         fonction = "4F"
 
@@ -92,7 +86,7 @@ class DX3(Appareil):
         envoi_trame(self.port_serial, self.adresse, fonction, self.retry, valeur)
 
     @property
-    def parking_plein(self):
+    def parking_plein(self) -> str:
 
         fonction = "4A"
 
@@ -100,7 +94,7 @@ class DX3(Appareil):
         return reponse
     
     @parking_plein.setter
-    def parking_plein(self, valeur: str):
+    def parking_plein(self, valeur: str) -> None:
 
         fonction = "4B"
 
