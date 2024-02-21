@@ -42,7 +42,7 @@ class DX3(Appareil):
         hexa_valeur_deux = hex(ord(valeur[1]))[2:]
         hexa_valeur_trois = hex(ord(valeur[2]))[2:]
 
-        valeur = (f"04{hexa_valeur_un}{hexa_valeur_deux}{hexa_valeur_trois}")
+        valeur = (f"0430{hexa_valeur_un}{hexa_valeur_deux}{hexa_valeur_trois}")
         #valeur = "04" + "30" + "34" + "35"
         print("afficheur")
         envoi_trame(self.port_serial, self.adresse, fonction, self.retry, valeur)
@@ -79,12 +79,6 @@ class DX3(Appareil):
         fonction = "4E"
         print("getter fleche")
         reponse = envoi_trame(self.port_serial, self.adresse, fonction, self.retry)[2:4]
-
-        try :
-            fleche.get(reponse)
-        except:
-            raise IndexError("L'appareil n'a pas répondu!")
-
         return reponse
     
     @fleche.setter
@@ -96,3 +90,18 @@ class DX3(Appareil):
             raise SyntaxError("Veuillez saisir une valeur compris dans : 01, 02, 03, 04, 05, 06, 07, 08, 09, 0A")
         print("setter fleche")
         envoi_trame(self.port_serial, self.adresse, fonction, self.retry, valeur)
+
+    @property
+    def parking_plein(self):
+
+        fonction = "4A"
+
+        reponse: str = envoi_trame(self.port_serial, self.adresse, fonction, self.retry)[2:4]
+        return reponse
+    
+    @parking_plein.setter
+    def parking_plein(self, valeur: str):
+
+        fonction = "4B"
+
+        envoi_trame(self.port_serial, self.adresse, fonction, self.retry, valeur)[2:4]
