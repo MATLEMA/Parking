@@ -29,7 +29,7 @@ def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "")   -> str 
             for i in range(0, len(valeur), 2):
                 somme += int(valeur[i:i+2], 16)
 
-        bcc = format(somme, "02x")[:2]
+        bcc = format(somme, "02x")[-2:]
 
         return bcc
 
@@ -42,7 +42,7 @@ def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "")   -> str 
             for i in range(0, len(valeur), 2):
                 somme += int(valeur[i:i+2], 16)
             
-        bcc = format(somme, "02x")[:2]
+        bcc = format(somme, "02x")[-2:]
 
         return bcc
     
