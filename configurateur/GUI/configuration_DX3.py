@@ -92,9 +92,9 @@ class Configuration_DX3(LabelFrame):
         # Fonction 40
         numero_variable = Variable(afficheur_labelframe, value="000")
         self.numero_entry = Entry(afficheur_labelframe, textvariable=numero_variable)
-        self.numero_entry.grid(row=0)
+        self.numero_entry.grid(row=0, column=1)
         numero_bouton_envoyer = Button(afficheur_labelframe, text="Envoyer", command=self.modifie_afficheur)
-        numero_bouton_envoyer.grid(row=1)
+        numero_bouton_envoyer.grid(row=1, column=1)
 
         # Fonction 4A et 4B
         self.parking_plein_variable = Variable(afficheur_labelframe)

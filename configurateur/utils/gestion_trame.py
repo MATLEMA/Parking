@@ -105,7 +105,7 @@ def verification_validite_trame(adresse_appareil: str, trame_recu: str) -> bool:
     adresse = adresse_appareil
     longueur_adresse = len(adresse_appareil)
     longueur_trame = len(trame_recu)
-    trame_a_traite = trame_recu[:2] # On enleve le bcc
+    trame_a_traiter = trame_recu[:2] # On enleve le bcc
     bcc_recu = trame_recu[-2:]      # On garde le bcc
     somme = 0
 
@@ -121,9 +121,21 @@ def verification_validite_trame(adresse_appareil: str, trame_recu: str) -> bool:
     # <adr><reg><~bcc>
     # <adr><~bcc>
     else:
-        for i in range(0, len(trame_a_traite), 2):
-            somme += int(trame_a_traite[i:i+2], 16)
+        for i in range(0, len(trame_a_traiter), 2):
+            somme += int(trame_a_traiter[i:i+2], 16)
         
         # Complément à un (inversion des 0 et des 1)
         bcc = hex(int(hex(somme), 16) ^ 0xFF)[2:]
         return bcc_recu == bcc
+    
+if __name__ == "__main__":
+    trame_a_traiter = "1b5300"
+    somme = 0
+    bcc = 0
+    for i in range(0, len(trame_a_traiter), 2):
+        somme += int(trame_a_traiter[i:i+2], 16)
+        print(somme)
+        
+    # Complément à un (inversion des 0 et des 1)
+    bcc = hex(int(hex(somme), 16) ^ 0xFF)[2:]
+    print(bcc)
