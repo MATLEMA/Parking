@@ -15,7 +15,7 @@ class Main:
 
         centrer_fenetre(parent, largeur, longeur)
 
-        parent.resizable(False, False)
+        parent.resizable(True, True)
         parent.title("Parking")
 
         self.fenetre_connexion = Connexion(parent, self.ouvrir_configuration, self.fermer_configuration, self.fermer_parking)

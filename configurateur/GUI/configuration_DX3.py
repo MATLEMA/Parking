@@ -93,6 +93,7 @@ class Configuration_DX3(LabelFrame):
         numero_variable = Variable(afficheur_labelframe, value="000")
         option_numero: list[str]= ["{0:0>3}".format(i) for i in range(0, 1000)]
         self.numero_entry = ttk.Combobox(afficheur_labelframe, textvariable=numero_variable, values=option_numero)
+        numero_variable.set("000")
         self.numero_entry.grid(row=0, column=1, padx= 5, pady= 5)
         numero_bouton_envoyer = Button(afficheur_labelframe, text="Envoyer", command=self.modifie_afficheur)
         numero_bouton_envoyer.grid(row=1, column=1, padx= 5, pady= 5)
@@ -105,6 +106,15 @@ class Configuration_DX3(LabelFrame):
         self.parking_plein_combobox.grid(row=0)
         parking_plein_envoyer = Button(afficheur_labelframe, text="Envoyer", command=self.modifie_parking_plein)
         parking_plein_envoyer.grid(row=1)
+
+        # Fonction 48 et 49
+        self.sens_variable = Variable(afficheur_labelframe)
+        self.retourne_sens()
+        option_sens: list[str]= ["< XXX", "XXX <"]
+        self.sens_combobox= ttk.Combobox(afficheur_labelframe, textvariable=self.sens_variable, values=option_sens)
+        self.sens_combobox.grid(row=2, column=0)
+        sens_envoyer= Button(afficheur_labelframe, text="Envoyer", command=self.modifie_sens)
+        sens_envoyer.grid(row=3, column=0)
 
     def modifie_fleche(self) -> None:
 
@@ -162,4 +172,25 @@ class Configuration_DX3(LabelFrame):
                     self.parking_plein_variable.set("Full")
                 case "81":
                     self.parking_plein_variable.set("HEt")
-                
+
+    def modifie_sens(self):
+
+        valeur: str = self.sens_combobox.get()
+        if valeur == "< XXX":
+            self.appareil.sens_afficheur= "01"
+        else:
+            self.appareil.sens_afficheur= "00"
+
+        self.sens_combobox.set(self.appareil.sens_afficheur)
+
+    def retourne_sens(self):
+
+        try:
+            valeur = self.appareil.sens_afficheur
+        except:
+            self.sens_variable.set("N/A")
+        else:
+            if valeur == "01":
+                self.sens_variable.set("< XXX")
+            else:
+                self.sens_variable.set("XXX <")

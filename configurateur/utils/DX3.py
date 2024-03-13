@@ -99,3 +99,18 @@ class DX3(Appareil):
         fonction = "4B"
 
         envoi_trame(self.port_serial, self.adresse, fonction, self.retry, valeur)[2:4]
+
+    @property
+    def sens_afficheur(self) -> str:
+
+        fonction = "48"
+
+        reponse: str = envoi_trame(self.port_serial, self.adresse, fonction, self.retry)[2:4]
+        return reponse
+    
+    @sens_afficheur.setter
+    def sens_afficheur(self, valeur: str) -> None:
+
+        fonction = "49"
+
+        envoi_trame(self.port_serial, self.adresse, fonction, self.retry, valeur)[2:4]
