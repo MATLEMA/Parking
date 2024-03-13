@@ -72,16 +72,16 @@ class Configuration_DX3(LabelFrame):
         f_bas_vert_droite = Radiobutton(fleche, text=u"\u21B1", font=("Courier", 30), variable= self.fleche_variable, value="05")
         f_bas_vert_gauche = Radiobutton(fleche, text=u"\u21B0", font=("Courier", 30), variable= self.fleche_variable, value="06")
 
-        f_haut_gauche.grid(column=0, row=0)
-        f_haut.grid(column=1, row=0)
-        f_haut_droite.grid(column=2, row=0)
+        #f_haut_gauche.grid(column=0, row=0)
+        #f_haut.grid(column=1, row=0)
+        #f_haut_droite.grid(column=2, row=0)
         f_gauche.grid(column=0, row=1)
         f_droite.grid(column=2, row=1)
-        f_bas_gauche.grid(column=0, row=2)
-        f_bas.grid(column=1, row=2)
-        f_bas_droite.grid(column=2, row=2)
-        f_bas_vert_droite.grid(column=2, row=3)
-        f_bas_vert_gauche.grid(column=0, row=3)
+        #f_bas_gauche.grid(column=0, row=2)
+        #f_bas.grid(column=1, row=2)
+        #f_bas_droite.grid(column=2, row=2)
+        #f_bas_vert_droite.grid(column=2, row=3)
+        #f_bas_vert_gauche.grid(column=0, row=3)
 
         fleche_bouton_envoyer = Button(fleche, text="Envoyer", command=self.modifie_fleche)
         fleche_bouton_envoyer.grid(column=1, row= 1, padx= 5, pady= 5)
@@ -91,10 +91,11 @@ class Configuration_DX3(LabelFrame):
 
         # Fonction 40
         numero_variable = Variable(afficheur_labelframe, value="000")
-        self.numero_entry = Entry(afficheur_labelframe, textvariable=numero_variable)
-        self.numero_entry.grid(row=0, column=1)
+        option_numero: list[str]= ["{0:0>3}".format(i) for i in range(0, 1000)]
+        self.numero_entry = ttk.Combobox(afficheur_labelframe, textvariable=numero_variable, values=option_numero)
+        self.numero_entry.grid(row=0, column=1, padx= 5, pady= 5)
         numero_bouton_envoyer = Button(afficheur_labelframe, text="Envoyer", command=self.modifie_afficheur)
-        numero_bouton_envoyer.grid(row=1, column=1)
+        numero_bouton_envoyer.grid(row=1, column=1, padx= 5, pady= 5)
 
         # Fonction 4A et 4B
         self.parking_plein_variable = Variable(afficheur_labelframe)
@@ -148,7 +149,17 @@ class Configuration_DX3(LabelFrame):
 
     def retourne_parking_plein(self):
         try :
-            self.parking_plein_variable.set(self.appareil.parking_plein)
+            valeur = self.appareil.parking_plein
         except:
             self.parking_plein_variable.set("N/A")
+        else:
+            match valeur:
+                case "41":
+                    self.parking_plein_variable.set("Croix rouge")
+                case "43":
+                    self.parking_plein_variable.set("Flèche rouge")
+                case "80":
+                    self.parking_plein_variable.set("Full")
+                case "81":
+                    self.parking_plein_variable.set("HEt")
                 

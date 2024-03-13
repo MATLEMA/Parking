@@ -226,5 +226,6 @@ class Configuration_SP3(LabelFrame):
                 self.indicateur_place_libre.itemconfig(self.cercle_place_libre, fill= "red")
         except: 
             sleep(10)
-        sleep(2)
-        self.place_libre_thread()
+        else :
+            sleep(5)
+            self.place_libre_thread()
