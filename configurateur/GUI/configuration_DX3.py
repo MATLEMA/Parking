@@ -56,36 +56,6 @@ class Configuration_DX3(LabelFrame):
 
         #-----------------------------------------------------------------------#
 
-        fleche = LabelFrame(self, text= "Flèche")
-        fleche.pack(side="left", anchor="nw")
-
-        # Fonctions 4E et 4F
-        self.fleche_variable = StringVar()
-        f_haut_gauche = Radiobutton(fleche, text=u"\u2196", font=("Courier", 30), variable= self.fleche_variable, value="0A") 
-        f_haut = Radiobutton(fleche, text=u"\u2191", font=("Courier", 30), variable= self.fleche_variable, value="02")
-        f_haut_droite = Radiobutton(fleche, text=u"\u2197", font=("Courier", 30), variable= self.fleche_variable, value="07")
-        f_gauche = Radiobutton(fleche, text=u"\u2190", font=("Courier", 30), variable= self.fleche_variable, value="03")
-        f_droite = Radiobutton(fleche, text=u"\u2192", font=("Courier", 30), variable= self.fleche_variable, value="01")
-        f_bas_gauche = Radiobutton(fleche, text=u"\u2199", font=("Courier", 30), variable= self.fleche_variable, value="09")
-        f_bas = Radiobutton(fleche, text=u"\u2193", font=("Courier", 30), variable= self.fleche_variable, value="04")
-        f_bas_droite = Radiobutton(fleche, text=u"\u2198", font=("Courier", 30), variable= self.fleche_variable, value="08")
-        f_bas_vert_droite = Radiobutton(fleche, text=u"\u21B1", font=("Courier", 30), variable= self.fleche_variable, value="05")
-        f_bas_vert_gauche = Radiobutton(fleche, text=u"\u21B0", font=("Courier", 30), variable= self.fleche_variable, value="06")
-
-        #f_haut_gauche.grid(column=0, row=0)
-        #f_haut.grid(column=1, row=0)
-        #f_haut_droite.grid(column=2, row=0)
-        f_gauche.grid(column=0, row=1)
-        f_droite.grid(column=2, row=1)
-        #f_bas_gauche.grid(column=0, row=2)
-        #f_bas.grid(column=1, row=2)
-        #f_bas_droite.grid(column=2, row=2)
-        #f_bas_vert_droite.grid(column=2, row=3)
-        #f_bas_vert_gauche.grid(column=0, row=3)
-
-        fleche_bouton_envoyer = Button(fleche, text="Envoyer", command=self.modifie_fleche)
-        fleche_bouton_envoyer.grid(column=1, row= 1, padx= 5, pady= 5)
-
         afficheur_labelframe = LabelFrame(self, text="Afficheur")
         afficheur_labelframe.pack(side="left", anchor="nw")
 
@@ -110,30 +80,13 @@ class Configuration_DX3(LabelFrame):
         # Fonction 48 et 49
         self.sens_variable = Variable(afficheur_labelframe)
         self.retourne_sens()
-        option_sens: list[str]= ["< XXX", "XXX <"]
+        option_sens: list[str]= ["< XXX", "XXX >"]
         self.sens_combobox= ttk.Combobox(afficheur_labelframe, textvariable=self.sens_variable, values=option_sens)
         self.sens_combobox.grid(row=2, column=0)
         sens_envoyer= Button(afficheur_labelframe, text="Envoyer", command=self.modifie_sens)
         sens_envoyer.grid(row=3, column=0)
 
-    def modifie_fleche(self) -> None:
-
-        hexa_fleche = self.fleche_variable.get()
-
-        if hexa_fleche == "N/A":
-            return print("Incorrect")
-
-        self.appareil.fleche = hexa_fleche
-        self.fleche_variable.set(self.appareil.fleche)
-
-    def retourne_fleche(self):
-
-        try:
-            self.fleche_variable.set(self.appareil.fleche)
-        except:
-            self.fleche_variable.set("N/A")
-
-    def modifie_afficheur(self):
+    def modifie_afficheur(self) -> None:
 
         valeur: str = self.numero_entry.get()
 
@@ -142,7 +95,7 @@ class Configuration_DX3(LabelFrame):
             
         self.appareil.afficheur(valeur)
 
-    def modifie_parking_plein(self):
+    def modifie_parking_plein(self) -> None:
         
         valeur: str = self.parking_plein_combobox.get()
 
@@ -155,11 +108,11 @@ class Configuration_DX3(LabelFrame):
                 self.appareil.parking_plein = "80"
             case "HEt":
                 self.appareil.parking_plein = "81"
-        self.parking_plein_combobox.set(self.appareil.parking_plein)
+        self.retourne_parking_plein()
 
     def retourne_parking_plein(self):
         try :
-            valeur = self.appareil.parking_plein
+            valeur: str = self.appareil.parking_plein
         except:
             self.parking_plein_variable.set("N/A")
         else:
@@ -173,7 +126,7 @@ class Configuration_DX3(LabelFrame):
                 case "81":
                     self.parking_plein_variable.set("HEt")
 
-    def modifie_sens(self):
+    def modifie_sens(self) -> None:
 
         valeur: str = self.sens_combobox.get()
         if valeur == "< XXX":
@@ -181,16 +134,16 @@ class Configuration_DX3(LabelFrame):
         else:
             self.appareil.sens_afficheur= "00"
 
-        self.sens_combobox.set(self.appareil.sens_afficheur)
+        self.retourne_parking_plein()
 
-    def retourne_sens(self):
+    def retourne_sens(self) -> None:
 
         try:
-            valeur = self.appareil.sens_afficheur
+            valeur: str = self.appareil.sens_afficheur
         except:
             self.sens_variable.set("N/A")
         else:
             if valeur == "01":
                 self.sens_variable.set("< XXX")
             else:
-                self.sens_variable.set("XXX <")
+                self.sens_variable.set("XXX >")

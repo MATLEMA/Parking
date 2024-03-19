@@ -16,7 +16,6 @@ class DX3(Appareil):
         valeur_parking_plein: str = "N/A"
 
         try :
-            valeur_fleche = self.fleche
             valeur_parking_plein = self.parking_plein
         except :
             pass
@@ -49,40 +48,6 @@ class DX3(Appareil):
         valeur = (f"0430{hexa_valeur_un}{hexa_valeur_deux}{hexa_valeur_trois}")
         #valeur = "04" + "30" + "34" + "35"
         print("afficheur")
-        envoi_trame(self.port_serial, self.adresse, fonction, self.retry, valeur)
-
-    @property
-    def fleche(self) -> str:
-        """Retourne une valeur hexadecimal
-
-        :raises IndexError: L'appareil n'a pas répondu
-        :return: Valeur héxadecimal de la flèche
-        :rtype: str
-
-        "01": "droite"
-        "02": "haut"
-        "03": "gauche"
-        "04": "bas"
-        "05": "bas-vers-droite"
-        "06": "bas-vers-gauche"
-        "07": "haut-droit"
-        "08": "bas-droit"
-        "09": "bas-gauche"
-        "0A": "haut-gauche"
-        """        
-        fonction = "4E"
-        print("getter fleche")
-        reponse = envoi_trame(self.port_serial, self.adresse, fonction, self.retry)[2:4]
-        return reponse
-    
-    @fleche.setter
-    def fleche(self, valeur : str) -> None:
-
-        fonction = "4F"
-
-        if valeur not in ["01","02","03","04","05","06","07","08","09","0A"]:
-            raise SyntaxError("Veuillez saisir une valeur compris dans : 01, 02, 03, 04, 05, 06, 07, 08, 09, 0A")
-        print("setter fleche")
         envoi_trame(self.port_serial, self.adresse, fonction, self.retry, valeur)
 
     @property

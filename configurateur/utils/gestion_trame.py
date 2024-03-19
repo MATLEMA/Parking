@@ -25,7 +25,7 @@ def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "")   -> str 
         if valeur == "" :
             somme = int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(nom_fonction, 16) 
         else : 
-            somme = int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(nom_fonction, 16)
+            somme: int = int(adresse_appareil[0:2], 16) + int(adresse_appareil[2:4], 16) + int(nom_fonction, 16)
             for i in range(0, len(valeur), 2):
                 somme += int(valeur[i:i+2], 16)
 
@@ -42,7 +42,7 @@ def calcul_bcc(adresse_appareil: str, nom_fonction : str, valeur = "")   -> str 
             for i in range(0, len(valeur), 2):
                 somme += int(valeur[i:i+2], 16)
             
-        bcc = format(somme, "02x")[-2:]
+        bcc: str = format(somme, "02x")[-2:]
 
         return bcc
     
@@ -69,7 +69,7 @@ def envoi_trame(port_serial: Serial, adresse_appareil : str, nom_fonction: str, 
     :rtype: str
     """    
 
-    bcc = calcul_bcc(adresse_appareil, nom_fonction, valeur)
+    bcc: str = calcul_bcc(adresse_appareil, nom_fonction, valeur)
     while retry > 0 :
         # Fabrication de la trame à envoyée
 
@@ -102,11 +102,11 @@ def verification_validite_trame(adresse_appareil: str, trame_recu: str) -> bool:
     <adr><~bcc>
     '''
 
-    adresse = adresse_appareil
-    longueur_adresse = len(adresse_appareil)
-    longueur_trame = len(trame_recu)
-    trame_a_traiter = trame_recu[:-2] # On enleve le bcc
-    bcc_recu = trame_recu[-2:]      # On garde le bcc
+    adresse: str = adresse_appareil
+    longueur_adresse: int = len(adresse_appareil)
+    longueur_trame: int = len(trame_recu)
+    trame_a_traiter: str = trame_recu[:-2] # On enleve le bcc
+    bcc_recu: str = trame_recu[-2:]      # On garde le bcc
     somme = 0
 
     # Test
@@ -127,5 +127,7 @@ def verification_validite_trame(adresse_appareil: str, trame_recu: str) -> bool:
             somme += int(trame_a_traiter[i:i+2], 16)
         
         # Complément à un (inversion des 0 et des 1)
-        bcc = hex(int(hex(somme), 16) ^ 0xFF)[2:]
+        bcc: str = hex(int(hex(somme), 16) ^ 0xFF)[2:]
+        if len(bcc) > 2:
+            bcc = bcc[-2:]
         return bcc_recu == bcc

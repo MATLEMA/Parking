@@ -105,10 +105,10 @@ class SP3(Appareil):
         except:
             raise ValueError("Veuillez saisir une valeur entre 1 et 64")
         
-        valeur = str(int(hex(int(valeur)), 16))
+        valeur = hex(int(valeur))[-2:]
 
         print("setter potentiometre")
-        reponse = envoi_trame(self.port_serial, self.adresse, fonction, self.retry, valeur)
+        reponse: str = envoi_trame(self.port_serial, self.adresse, fonction, self.retry, valeur)
 
         if reponse == self.adresse :
             return True
@@ -126,9 +126,11 @@ class SP3(Appareil):
 
         print("getter distance maximal")
         reponse = envoi_trame(self.port_serial, self.adresse, fonction, self.retry)
+        print(reponse)
 
         # La valeur de la distance maximal se trouve sur le 3ème octet de la trame réponse
         limite_superieur = 80 + int(reponse[4:6], 16) * 10 - 1
+        print(limite_superieur)
 
         if limite_superieur < 400 and reponse[4:6] != "15" and reponse[4:6] != "16" :
             self.valeur_distance_maximal = limite_superieur
@@ -235,7 +237,7 @@ class SP3(Appareil):
         
     # Fonction 0x13 | Modifie le mode de reception/transmission ultrason
     @transceiver.setter
-    def transceiver(self, valeur : bool) -> bool :
+    def transceiver(self, valeur : bool) -> None :
         '''
         Modifie le mode de reception/transmission ultrason
         La fonction confirme que l'appareil à répondu
@@ -243,7 +245,7 @@ class SP3(Appareil):
         # Nom de la fonction
         fonction = "13"
 
-        if valeur == True : 
+        if valeur == False : 
             # En mode reception
             mode_reception_transmission : str = "00"
         else : 
@@ -253,11 +255,6 @@ class SP3(Appareil):
         print("setter transceiver")
         reponse = envoi_trame(self.port_serial, self.adresse, fonction, self.retry, mode_reception_transmission)
 
-        if reponse == self.adresse :
-            return True
-        else : 
-            return False
-        
     # Fonction 0x10 | Retourne si la place est libre ou non 
     def place_libre(self) -> bool :
         '''

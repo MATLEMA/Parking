@@ -142,6 +142,7 @@ class Configuration_SP3(LabelFrame):
     def toggle_calibration_auto(self) :
 
         self.appareil.calibration_potentiomètre()
+        sleep(1)
         self.valeur_potentiometre_variable.set(self.appareil.potentiometre)
 
     def modifie_valeur_potentiometre(self):
@@ -173,12 +174,11 @@ class Configuration_SP3(LabelFrame):
         mode = self.mode_de_detection_variable.get() 
         if mode in ["vrai","Vrai","v","V","true","True","t","T"] :
             self.appareil.mode_detection = True
-            self.mode_de_detection_variable.set(True)
         elif mode in ["faux","Faux","f","F","false","False"] :
             self.appareil.mode_detection = False
-            self.mode_de_detection_variable.set(False)
         else :
             raise SyntaxError("Invalide veuillez saisir faux/vrai")
+        self.retourne_prise_en_compte_detection_sol()
 
 
     def retourne_prise_en_compte_detection_sol(self):
@@ -198,17 +198,17 @@ class Configuration_SP3(LabelFrame):
         mode = self.mode_de_transceiver_variable.get()
         if mode == "vrai" :
             self.appareil.transceiver = True
-            self.mode_de_transceiver_variable.set(True)
         elif mode == "faux" :
             self.appareil.transceiver = False
-            self.mode_de_transceiver_variable.set(False)
         else :
             raise SyntaxError("Invalide veuillez saisir faux/vrai")
+        self.retourne_transceiver()
         
     def retourne_transceiver(self):
-
+        print(self.appareil.transceiver)
         try : 
-            mode = self.appareil.transceiver
+            print(self.appareil.transceiver)
+            mode: bool = self.appareil.transceiver
         except :
             self.mode_de_transceiver_variable.set("N/A")
         else :
