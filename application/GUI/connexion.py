@@ -11,16 +11,20 @@ class Connexion(LabelFrame) :
     def __init__(
             self,
             parent,
-            fonction_rappel_ouvrir_configuration,
-            fonction_rappel_fermer_configuration,
-            fonction_rappel_fermer_configuration_objet
+            ouvrir_gestion_DX3,
+            fermer_gestion_DX3,
+            fermer_gestion_SP3,
+            ouvrir_parking,
+            fermer_parking
             ) :
         super().__init__(parent , text= "Connexion")
 
         self.parent = parent
-        self.fonction_rappel_ouvrir_configuration = fonction_rappel_ouvrir_configuration
-        self.fonction_rappel_fermer_configuration = fonction_rappel_fermer_configuration
-        self.fonction_rappel_fermer_configuration_objet = fonction_rappel_fermer_configuration_objet
+        self.ouvrir_gestion_DX3 = ouvrir_gestion_DX3
+        self.fermer_gestion_DX3 = fermer_gestion_DX3
+        self.fermer_gestion_SP3 = fermer_gestion_SP3
+        self.ouvrir_parking = ouvrir_parking
+        self.fermer_parking = fermer_parking
 
         # Listing des ports 
         port_disponible: list[str] = listing_port()
@@ -73,7 +77,7 @@ class Connexion(LabelFrame) :
             centrer_fenetre(self.parent, 1600, 800)
 
             # Toutes les variables passées dans cette fonction seront envoyer dans la class configuration
-            self.fonction_rappel_ouvrir_configuration(self.port_actuelle)
+            self.ouvrir_gestion_DX3(self.port_actuelle)
 
             self.deconnexion_bouton()
 
@@ -94,4 +98,6 @@ class Connexion(LabelFrame) :
 
         redefinir_fenetre(self.parent, largeur, longeur)
         
-        self.fonction_rappel_fermer_configuration()
+        self.fermer_gestion_DX3()
+        self.fermer_gestion_SP3()
+        self.fermer_parking()

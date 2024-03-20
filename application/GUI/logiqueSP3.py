@@ -2,14 +2,13 @@ from serial import Serial
 from tkinter import LabelFrame, Tk, Variable, Listbox, Button, Label, Entry, messagebox
 from utils import Appareil, fonction0x05, SP3, DX3, Parking
 
-class GestionListbox(LabelFrame):
+class GestionListboxSP3(LabelFrame):
 
     def __init__(self, parent : Tk, port : Serial):
-        super().__init__(parent, text= "Parking")
+        super().__init__(parent, text= "SP3")
         
         self.port: Serial = port
         self.parent: Tk = parent
-        self.liste_DX3: list[DX3] = []
         self.liste_SP3: list[SP3] = []
         self.dict_des_objets: dict[str, dict[str, str | None | bool]] = {}
 
@@ -50,7 +49,7 @@ class GestionListbox(LabelFrame):
                 is_valid = False
 
             # Test si un appareil est derrière l'adresse donnée (si elle répond ou non)
-            # Si oui, on créera une instance Appareil, puis un instance DX3 ou SP3 en fonction de son nom de modèle
+            # Si oui, on créera une instance Appareil, puis un instance SP3 en fonction de son nom de modèle
             if is_valid == True :
                 try :
                     nom_appareil, _ = fonction0x05(self.port, str(adresse))
@@ -62,62 +61,34 @@ class GestionListbox(LabelFrame):
 
     def ajout_objet(self, appareil: Appareil)  -> None:
 
-        objet: SP3 | DX3 = self.assignation_class_objet(appareil)
+        objet: SP3 = self.assignation_class_objet(appareil)
 
         if isinstance(objet, SP3) :
             self.ajout_listbox_SP3(objet)
-            
-        if isinstance(objet, DX3) :
-            self.ajout_listbox_DX3(objet)
 
-    def assignation_class_objet(self, appareil : Appareil)  -> SP3 | DX3:
+    def assignation_class_objet(self, appareil : Appareil)  -> SP3:
 
         if appareil.modele == "SP3" :
             appareil = SP3(appareil.adresse, appareil.port_serial, appareil.modele)
             return appareil
         
-        if appareil.modele == "DX3" :
-            appareil = DX3(appareil.adresse, appareil.port_serial, appareil.modele)
-            return appareil
-        
         else : raise TypeError("L'appareil n'a pas de modèle reconnu")
 
+        
     def ajout_listbox_SP3(self, objet : SP3 )  -> None:
+        
+        self.dict_des_objets.clear()
 
-        # dictionnaire de TOUT les objets
-        self.dict_des_objets[objet.adresse] = {
-            "modele": objet.modele,
-            "port" : objet.port_serial.port,
-        }
-        # liste uniquement de TOUT les SP3
-        self.liste_SP3.append(objet)
-
-        self.maj_listbox()
-
-    def ajout_listbox_DX3(self, objet: DX3)  -> None:
-
-        # dictionnaire de TOUT les objets
         self.dict_des_objets[objet.adresse] = {
             "modele": objet.modele,
             "port" : objet.port_serial.port,
             }
-        # liste uniquement de TOUT les DX3
-        self.liste_DX3.append(objet)
+
+        self.liste_SP3.append(objet)
 
         self.maj_listbox()
 
     def maj_listbox(self) -> None:
 
         self.variable_pour_liste.set(list(self.dict_des_objets.keys()))
-        self.check_conditions()
 
-    def check_conditions(self) -> None:
-
-        if len(self.liste_SP3) >= 1 and len(self.liste_DX3) == 1:
-            self.lancement_parking()
-        else :
-            self.lancement = None
-
-    def lancement_parking(self) -> None:
-
-        self.lancement = Parking(self.liste_SP3, self.liste_DX3)
