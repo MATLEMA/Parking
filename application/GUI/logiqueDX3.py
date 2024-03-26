@@ -12,6 +12,7 @@ class GestionListboxDX3(LabelFrame):
         self.liste_DX3: list[DX3] = []
         self.dict_des_objets: dict[str, dict[str, str | None | bool]] = {}
         self.fonction_rapppel_ouvrir_gestion_SP3 = fonction_rapppel_ouvrir_gestion_SP3
+        self.assigne = False
 
         self.variable_pour_liste = Variable()
         self.liste = Listbox(self, listvariable= self.variable_pour_liste)
@@ -66,6 +67,9 @@ class GestionListboxDX3(LabelFrame):
 
         objet: DX3 = self.assignation_class_objet(appareil)
 
+        if self.assigne == True:
+            self.liste_DX3.clear()
+            
         if isinstance(objet, DX3) :
             self.ajout_listbox_DX3(objet)
 
@@ -88,6 +92,7 @@ class GestionListboxDX3(LabelFrame):
             }
         # liste uniquement de TOUT les DX3
         self.liste_DX3.append(objet)
+        self.dx3 = objet
 
         self.maj_listbox()
 
@@ -95,4 +100,7 @@ class GestionListboxDX3(LabelFrame):
 
         self.variable_pour_liste.set(list(self.dict_des_objets.keys()))
 
-        self.fonction_rapppel_ouvrir_gestion_SP3()
+        if self.assigne == True:
+            return
+        self.fonction_rapppel_ouvrir_gestion_SP3(self.dx3)
+        self.assigne = True

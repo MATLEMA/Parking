@@ -4,13 +4,15 @@ from utils import Appareil, fonction0x05, SP3, DX3, Parking
 
 class GestionListboxSP3(LabelFrame):
 
-    def __init__(self, parent : Tk, port : Serial):
+    def __init__(self, parent : Tk, port : Serial, ouvrir_parking):
         super().__init__(parent, text= "SP3")
         
         self.port: Serial = port
         self.parent: Tk = parent
+        self.ouvrir_parking = ouvrir_parking
         self.liste_SP3: list[SP3] = []
         self.dict_des_objets: dict[str, dict[str, str | None | bool]] = {}
+        self.existe = False
 
         self.variable_pour_liste = Variable()
         self.liste = Listbox(self, listvariable= self.variable_pour_liste)
@@ -91,4 +93,9 @@ class GestionListboxSP3(LabelFrame):
     def maj_listbox(self) -> None:
 
         self.variable_pour_liste.set(list(self.dict_des_objets.keys()))
+
+        if self.existe == False:
+            self.ouvrir_parking()
+            self.existe = True
+
 
