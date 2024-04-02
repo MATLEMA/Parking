@@ -24,11 +24,6 @@ class Configuration(LabelFrame) :
         self.liste = Listbox(self, listvariable= self.variable_pour_liste)
         self.liste.pack(side="top", expand=True, fill= "both")
 
-        # Test
-        self.ajout_objet(Appareil("4F31", self.port_actuelle, "SP3", 1.0))
-
-        self.ajout_objet(Appareil("4E", self.port_actuelle, "DX3", 1.0))
-
         # Permet de "bind" la sélection dans la listebox avec une fonction ici la fonction permettant d'ouvrir une fenetre
         self.liste.bind("<<ListboxSelect>>", self.selection_objet)
 
@@ -126,7 +121,8 @@ class Configuration(LabelFrame) :
 
     def selection_objet(self, event)  -> None:
         
-        redefinir_fenetre(self.parent, 1600, 800)
+        redefinir_fenetre(self.parent, 1670, 800)
+        centrer_fenetre(self.parent, 1670, 800)
         try :
             adresse_objet: str = self.liste.selection_get()
         except :

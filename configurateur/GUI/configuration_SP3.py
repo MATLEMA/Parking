@@ -57,11 +57,6 @@ class Configuration_SP3(LabelFrame):
         afficher_adresse_objet["state"] = "disabled"
 
         #-----------------------------------------------------------------------------------------#
-        # Bouton fonction 01
-        mode_test = Button(config_defaut, text="Activer Mode Test", command=self.si_detection_sol)
-        mode_test.grid(row= 8, padx= 5, pady= 5)
-
-        #-----------------------------------------------------------------------------------------#
         potentiometre_labelframe = LabelFrame(self, text= "Potentiomètre" )
         potentiometre_labelframe.pack(side="left", anchor="nw")
         # Bouton fonction 02
@@ -87,14 +82,16 @@ class Configuration_SP3(LabelFrame):
         # Fonctions 06 et 11
         self.valeur_distance_maximal_variable = Variable(maxdistance_labelframe, name="valeur_distance_maximal")
         self.retourne_valeur_distance_maximal()
-        option_valeur_distance_maximal: list[str] = [str(i) for i in range(150, 401)]
+        option_valeur_distance_maximal: list[str] = [str(i) for i in range(150, 200)]
         option_valeur_distance_maximal.append("N/A")
+        mode_test = Button(maxdistance_labelframe, text="Activer Mode Hauteur auto", command=self.si_detection_sol)
+        mode_test.grid(row= 0, padx= 5, pady= 5)
         valeur_distance_maximal_entry = ttk.Combobox(maxdistance_labelframe, textvariable= self.valeur_distance_maximal_variable, values=option_valeur_distance_maximal)
-        valeur_distance_maximal_entry.grid(row= 0, padx= 5, pady= 5)
+        valeur_distance_maximal_entry.grid(row= 1, padx= 5, pady= 5)
         valeur_distance_maximal_bouton_envoyer = Button(maxdistance_labelframe, text="Envoyer", command=self.modifie_valeur_distance_maximal)
-        valeur_distance_maximal_bouton_envoyer.grid(row= 1, padx= 5, pady= 5)
+        valeur_distance_maximal_bouton_envoyer.grid(row= 2, padx= 5, pady= 5)
         valeur_distance_maximal_bouton_recevoir = Button(maxdistance_labelframe, text="Recevoir", command=self.retourne_valeur_distance_maximal)
-        valeur_distance_maximal_bouton_recevoir.grid(row= 2, padx= 5, pady= 5)
+        valeur_distance_maximal_bouton_recevoir.grid(row= 3, padx= 5, pady= 5)
 
         #-----------------------------------------------------------------------------------------#
         mode_detection_labelframe = LabelFrame(self, text= "Mode de détection")

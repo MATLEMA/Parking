@@ -69,8 +69,8 @@ class Connexion(LabelFrame) :
             self.combobox_baudrate["state"] = "disabled"
             self.combobox_timeout["state"] = "disabled"
 
-            redefinir_fenetre(self.parent, 1600, 800)
-            centrer_fenetre(self.parent, 1600, 800)
+            redefinir_fenetre(self.parent, (largeur+320) , (longeur + 130))
+            centrer_fenetre(self.parent, (largeur+320) , (longeur + 130))
 
             # Toutes les variables passées dans cette fonction seront envoyer dans la class configuration
             self.fonction_rappel_ouvrir_configuration(self.port_actuelle)
