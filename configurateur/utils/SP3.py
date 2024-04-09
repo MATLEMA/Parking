@@ -10,11 +10,6 @@ class SP3(Appareil):
             port_serial : Serial,
             modele : str ,
             version: float,
-            valeur_potentiometre :str = "N/A",#TODO supprime
-            valeur_distance_maximal: int | str = "N/A",#TODO supprime
-            mode_detection: bool | str = "N/A",             #TODO supprime
-            mode_transceiver: bool | str = "N/A",#TODO supprime
-            _place_libre: bool | str = "N/A"#TODO supprime
             ) -> None:
         super().__init__(adresse, port_serial, modele, version)
             
@@ -25,17 +20,16 @@ class SP3(Appareil):
             mode_transceiver = self.transceiver
             _place_libre = self.place_libre()
         except :
-            pass
+            self.valeur_potentiometre = "N/A"
+            self.valeur_distance_maximal = "N/A"
+            self._mode_detection = "N/A"
+            self.mode_transceiver = "N/A"
+            self._place_libre = "N/A"
 
         self.adresse = adresse
         self.port_serial = port_serial
         self.modele = modele
         self.version = version
-        self.valeur_potentiometre = valeur_potentiometre
-        self.valeur_distance_maximal = valeur_distance_maximal
-        self._mode_detection = mode_detection
-        self.mode_transceiver = mode_transceiver
-        self._place_libre = _place_libre
 
     # Nombre d'envoie de la trame, avant echec
     retry = 1

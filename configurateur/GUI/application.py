@@ -23,15 +23,14 @@ class Main:
         parent.title("Parking")
 
         self.fenetre_connexion = Connexion(parent, self.ouvrir_configuration, self.fermer_configuration, self.fermer_configuration_objets)
-        self.fenetre_connexion.pack(side="left", anchor= "nw")
+        self.fenetre_connexion.place(x=0, y=0)
     
         parent.mainloop()
 
     def ouvrir_configuration(self, port_actuelle) :
 
         self.application_configuration = Configuration(self.parent, port_actuelle, self.ouvrir_configuration_objet_SP3, self.ouvrir_configuration_objet_DX3, self.fermer_configuration_objets)
-        self.application_configuration.pack(side="left", expand=False, fill= "y",anchor= "n", ipady= 50, ipadx= 50)
-
+        self.application_configuration.place(x=168, y= 0, width=200, height=300)
     def fermer_configuration(self):
 
         self.application_configuration.destroy()
@@ -39,12 +38,12 @@ class Main:
     def ouvrir_configuration_objet_SP3(self, dict_des_objets, liste_des_instances_appareil, listbox) :
 
         self._configuration_objet_SP3 = Configuration_SP3(self.parent, dict_des_objets, liste_des_instances_appareil, listbox)
-        self._configuration_objet_SP3.pack(side="left", anchor="n")
+        self._configuration_objet_SP3.place(x=368, y=0)
     
     def ouvrir_configuration_objet_DX3(self, dict_des_objets, liste_des_instances_appareil, listbox):
 
         self._configuration_objet_DX3 = Configuration_DX3(self.parent, dict_des_objets, liste_des_instances_appareil, listbox)
-        self._configuration_objet_DX3.pack(side="left", anchor="n")
+        self._configuration_objet_DX3.place(x=368, y=0)
 
     def fermer_configuration_objets(self) :
 

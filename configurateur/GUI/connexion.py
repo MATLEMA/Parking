@@ -5,6 +5,8 @@ from serial import Serial
 
 longeur = 185
 largeur = 165
+nouvelle_fenetre_longueur = 385
+nouvelle_fenetre_hauteur = 300
 
 class Connexion(LabelFrame) :
     
@@ -69,8 +71,7 @@ class Connexion(LabelFrame) :
             self.combobox_baudrate["state"] = "disabled"
             self.combobox_timeout["state"] = "disabled"
 
-            redefinir_fenetre(self.parent, (largeur+320) , (longeur + 130))
-            centrer_fenetre(self.parent, (largeur+320) , (longeur + 130))
+            centrer_fenetre(self.parent, nouvelle_fenetre_longueur , nouvelle_fenetre_hauteur)
 
             # Toutes les variables passées dans cette fonction seront envoyer dans la class configuration
             self.fonction_rappel_ouvrir_configuration(self.port_actuelle)

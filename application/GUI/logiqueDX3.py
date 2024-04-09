@@ -1,6 +1,11 @@
 from serial import Serial
 from tkinter import LabelFrame, Tk, Variable, Listbox, Button, Label, Entry, messagebox
 from utils import Appareil, fonction0x05, SP3, DX3, Parking
+from .recadrage_fenetre import redefinir_fenetre
+
+
+nouvelle_fenetre_longueur = 568
+nouvelle_fenetre_hauteur = 300
 
 class GestionListboxDX3(LabelFrame):
 
@@ -24,7 +29,7 @@ class GestionListboxDX3(LabelFrame):
 
         # Ajout manuel d'adresse objet 
 
-        #self.ajout_objet(Appareil("4E", self.port, "DX3"))
+        self.ajout_objet(Appareil("4E", self.port, "DX3"))
 
         self.adresse_entree = Label(self, text= " Veuillez inscrire l'adresse de l'objet :")
         self.adresse_entree.pack(side= "top", pady= 5)
@@ -102,5 +107,7 @@ class GestionListboxDX3(LabelFrame):
 
         if self.assigne == True:
             return
+        
+        redefinir_fenetre(self.parent, nouvelle_fenetre_longueur, nouvelle_fenetre_hauteur)
         self.fonction_rapppel_ouvrir_gestion_SP3(self.dx3)
         self.assigne = True

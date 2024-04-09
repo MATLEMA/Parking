@@ -14,7 +14,7 @@ class Main:
     def __init__(self) -> None:
 
         parent = Tk()
-        self.parent = parent
+        self.parent: Tk = parent
 
         centrer_fenetre(parent, largeur, longeur)
 
@@ -22,7 +22,7 @@ class Main:
         parent.title("Parking")
 
         self.fenetre_connexion = Connexion(parent, ouvrir_gestion_DX3=self.ouvrir_gestion_DX3, fermer_gestion_DX3=self.fermer_gestion_DX3, ouvrir_parking=self.ouvrir_parking, fermer_gestion_SP3=self.fermer_gestion_SP3, fermer_parking=self.fermer_parking, )
-        self.fenetre_connexion.pack(side="left", anchor= "nw")
+        self.fenetre_connexion.place(x= 0, y= 0)
     
         parent.mainloop()
 
@@ -30,7 +30,7 @@ class Main:
         self.port_actuelle: Serial = port_actuelle
         
         self.gestion_DX3 = GestionListboxDX3(self.parent, port_actuelle, self.ouvrir_gestion_SP3)
-        self.gestion_DX3.pack(side="left", anchor="nw")
+        self.gestion_DX3.place(x=168, y= 0)
 
     def fermer_gestion_DX3(self):
 
@@ -40,7 +40,7 @@ class Main:
 
         self.adresse_DX3 = liste_DX3
         self.gestion_SP3 = GestionListboxSP3(self.parent, self.port_actuelle, self.ouvrir_parking)
-        self.gestion_SP3.pack(side="left", anchor="nw")
+        self.gestion_SP3.place(x=368, y= 0)
     
     def fermer_gestion_SP3(self):
 
@@ -49,7 +49,8 @@ class Main:
     def ouvrir_parking(self) :
         
         self.launch = Launch(self.parent, self.port_actuelle, self.adresse_DX3)
-        self.launch.pack(side="left", anchor="nw")
+        self.launch.place(x=235, y= 270)
+
 
     def fermer_parking(self) :
 

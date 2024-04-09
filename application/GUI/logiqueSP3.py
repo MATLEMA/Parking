@@ -23,6 +23,7 @@ class GestionListboxSP3(LabelFrame):
         #self.liste.bind("<<ListboxSelect>>", self.selection_objet)
 
         # Ajout manuel d'adresse objet 
+        self.ajout_objet(Appareil("4F34", self.port, "SP3"))
 
         self.adresse_entree = Label(self, text= " Veuillez inscrire l'adresse de l'objet :")
         self.adresse_entree.pack(side= "top", pady= 5)

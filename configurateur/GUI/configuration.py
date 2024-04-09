@@ -19,6 +19,7 @@ class Configuration(LabelFrame) :
         self.dict_des_objets : dict[str, dict[str, str | int | bool | None]] = {}
         self.liste_des_instances_appareil: list[SP3 | DX3] = []
         self.fenetre_ouverte = "00"
+        self.first_time = False
 
         self.variable_pour_liste = Variable()
         self.liste = Listbox(self, listvariable= self.variable_pour_liste)
@@ -26,6 +27,8 @@ class Configuration(LabelFrame) :
 
         # Permet de "bind" la sélection dans la listebox avec une fonction ici la fonction permettant d'ouvrir une fenetre
         self.liste.bind("<<ListboxSelect>>", self.selection_objet)
+        self.ajout_objet(Appareil("4E", self.port_actuelle, "DX3", 1))
+        self.ajout_objet(Appareil("34F1", self.port_actuelle, "SP3", 1))
 
         self.configuration_objet = LabelFrame(self.parent, text= "Configuration de l'objet :")
         self.configuration_objet.pack(side="left", expand=False, anchor="n")
@@ -121,8 +124,6 @@ class Configuration(LabelFrame) :
 
     def selection_objet(self, event)  -> None:
         
-        redefinir_fenetre(self.parent, 1670, 800)
-        centrer_fenetre(self.parent, 1670, 800)
         try :
             adresse_objet: str = self.liste.selection_get()
         except :
@@ -140,7 +141,16 @@ class Configuration(LabelFrame) :
 
         if str(self.dict_des_objets[adresse_objet]["modele"]) == "SP3" :
             self.ouvrir_fenetre_SP3(self.dict_des_objets, self.liste_des_instances_appareil, self.liste)
+            redefinir_fenetre(self.parent, 1258, 300)
+            if self.first_time == False:
+                centrer_fenetre(self.parent, 1258, 300)
+                self.first_time = True
 
         if str(self.dict_des_objets[adresse_objet]["modele"]) == "DX3" :
             self.ouvrir_fenetre_DX3(self.dict_des_objets, self.liste_des_instances_appareil, self.liste)
+            redefinir_fenetre(self.parent, 830, 300)
+            if self.first_time == False:
+                centrer_fenetre(self.parent, 1258, 300)
+                self.first_time = True
+
         self.fenetre_ouverte = adresse_objet

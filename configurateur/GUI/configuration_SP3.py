@@ -21,7 +21,7 @@ class Configuration_SP3(LabelFrame):
         config_defaut = Frame(self)
         config_defaut.pack(side="left", anchor="nw")
         # Port
-        label_port_com = Label(config_defaut, text= "Port COM de l'objet :")
+        label_port_com = Label(config_defaut, text= "Port COM :")
         label_port_com.grid(column=0, row= 0)
 
         afficher_port_com = Entry(config_defaut)
@@ -30,7 +30,7 @@ class Configuration_SP3(LabelFrame):
         afficher_port_com["state"] = "disabled"
 
         # Modele
-        label_modele_objet = Label(config_defaut, text= "Modele de l'objet :")
+        label_modele_objet = Label(config_defaut, text= "Modele :")
         label_modele_objet.grid(column= 0, row= 2)
 
         afficher_modele_objet = Entry(config_defaut)
@@ -39,7 +39,7 @@ class Configuration_SP3(LabelFrame):
         afficher_modele_objet["state"] = "disabled"
 
         # Version
-        label_version_objet = Label(config_defaut, text= "Version logiciel de l'objet :")
+        label_version_objet = Label(config_defaut, text= "Version logiciel :")
         label_version_objet.grid(column= 0, row= 4)
 
         afficher_version_objet = Entry(config_defaut)
@@ -48,7 +48,7 @@ class Configuration_SP3(LabelFrame):
         afficher_version_objet["state"] = "disabled"
 
         # Adresse
-        label_adresse_objet = Label(config_defaut, text= "Adresse de l'objet :")
+        label_adresse_objet = Label(config_defaut, text= "Adresse :")
         label_adresse_objet.grid(column= 0, row= 6)
 
         afficher_adresse_objet = Entry(config_defaut)
@@ -202,7 +202,7 @@ class Configuration_SP3(LabelFrame):
         self.retourne_transceiver()
         
     def retourne_transceiver(self):
-        print(self.appareil.transceiver)
+
         try : 
             print(self.appareil.transceiver)
             mode: bool = self.appareil.transceiver

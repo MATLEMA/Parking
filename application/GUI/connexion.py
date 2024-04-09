@@ -5,6 +5,8 @@ from .recadrage_fenetre import redefinir_fenetre, centrer_fenetre
 
 longeur = 185
 largeur = 165
+nouvelle_fenetre_longueur = 370
+nouvelle_fenetre_hauteur = 300
 
 class Connexion(LabelFrame) :
     
@@ -73,8 +75,7 @@ class Connexion(LabelFrame) :
             self.combobox_baudrate["state"] = "disabled"
             self.combobox_timeout["state"] = "disabled"
 
-            redefinir_fenetre(self.parent, 1600, 800)
-            centrer_fenetre(self.parent, 1600, 800)
+            centrer_fenetre(self.parent, nouvelle_fenetre_longueur, nouvelle_fenetre_hauteur)
 
             # Toutes les variables passées dans cette fonction seront envoyer dans la class configuration
             self.ouvrir_gestion_DX3(self.port_actuelle)
